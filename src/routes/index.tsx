@@ -58,7 +58,7 @@ function Index() {
                 Powered by AI
               </span>
               <h1 className="mt-6 font-display text-5xl font-bold leading-[1.05] sm:text-6xl">
-                INVITAIA <span className="text-gold">Design</span> Generator
+                INVITAIA <span className="text-gold">Studio</span>
               </h1>
               <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
                 Crea invitaciones profesionales impulsadas por IA. Elige el tipo de evento para comenzar.
