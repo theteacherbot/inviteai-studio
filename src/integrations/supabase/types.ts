@@ -14,7 +14,172 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      event_types: {
+        Row: {
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+        }
+        Relationships: []
+      }
+      events: {
+        Row: {
+          created_at: string
+          event_type_name: string
+          event_type_slug: string
+          form_data: Json
+          id: string
+          user_id: string | null
+          w4h1: Json
+        }
+        Insert: {
+          created_at?: string
+          event_type_name: string
+          event_type_slug: string
+          form_data: Json
+          id?: string
+          user_id?: string | null
+          w4h1: Json
+        }
+        Update: {
+          created_at?: string
+          event_type_name?: string
+          event_type_slug?: string
+          form_data?: Json
+          id?: string
+          user_id?: string | null
+          w4h1?: Json
+        }
+        Relationships: []
+      }
+      generated_images: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          prompt_id: string | null
+          provider: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          prompt_id?: string | null
+          provider?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          prompt_id?: string | null
+          provider?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_images_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generated_images_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generated_qrs: {
+        Row: {
+          created_at: string
+          data_url: string
+          event_id: string
+          id: string
+          payload: Json
+        }
+        Insert: {
+          created_at?: string
+          data_url: string
+          event_id: string
+          id?: string
+          payload: Json
+        }
+        Update: {
+          created_at?: string
+          data_url?: string
+          event_id?: string
+          id?: string
+          payload?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_qrs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prompts: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          model: string | null
+          prompt_text: string
+          provider: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          model?: string | null
+          prompt_text: string
+          provider?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          model?: string | null
+          prompt_text?: string
+          provider?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prompts_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
