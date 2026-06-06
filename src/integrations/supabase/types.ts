@@ -41,7 +41,145 @@ export type Database = {
         }
         Relationships: []
       }
-      events: {
+      generated_images: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string
+          prompt_id: string | null
+          provider: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id: string
+          prompt_id?: string | null
+          provider?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string
+          prompt_id?: string | null
+          provider?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_images_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generated_images_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "generated_prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generated_jsons: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string
+          w4h1: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id: string
+          w4h1: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string
+          w4h1?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_jsons_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generated_prompts: {
+        Row: {
+          created_at: string
+          id: string
+          model: string | null
+          project_id: string
+          prompt_text: string
+          provider: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          model?: string | null
+          project_id: string
+          prompt_text: string
+          provider?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          model?: string | null
+          project_id?: string
+          prompt_text?: string
+          provider?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_prompts_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      generated_qrs: {
+        Row: {
+          created_at: string
+          data_url: string
+          id: string
+          payload: Json
+          project_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_url: string
+          id?: string
+          payload: Json
+          project_id: string
+        }
+        Update: {
+          created_at?: string
+          data_url?: string
+          id?: string
+          payload?: Json
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "generated_qrs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
         Row: {
           created_at: string
           event_type_name: string
@@ -70,115 +208,6 @@ export type Database = {
           w4h1?: Json
         }
         Relationships: []
-      }
-      generated_images: {
-        Row: {
-          created_at: string
-          event_id: string
-          id: string
-          prompt_id: string | null
-          provider: string | null
-          url: string
-        }
-        Insert: {
-          created_at?: string
-          event_id: string
-          id?: string
-          prompt_id?: string | null
-          provider?: string | null
-          url: string
-        }
-        Update: {
-          created_at?: string
-          event_id?: string
-          id?: string
-          prompt_id?: string | null
-          provider?: string | null
-          url?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "generated_images_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "generated_images_prompt_id_fkey"
-            columns: ["prompt_id"]
-            isOneToOne: false
-            referencedRelation: "prompts"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      generated_qrs: {
-        Row: {
-          created_at: string
-          data_url: string
-          event_id: string
-          id: string
-          payload: Json
-        }
-        Insert: {
-          created_at?: string
-          data_url: string
-          event_id: string
-          id?: string
-          payload: Json
-        }
-        Update: {
-          created_at?: string
-          data_url?: string
-          event_id?: string
-          id?: string
-          payload?: Json
-        }
-        Relationships: [
-          {
-            foreignKeyName: "generated_qrs_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      prompts: {
-        Row: {
-          created_at: string
-          event_id: string
-          id: string
-          model: string | null
-          prompt_text: string
-          provider: string | null
-        }
-        Insert: {
-          created_at?: string
-          event_id: string
-          id?: string
-          model?: string | null
-          prompt_text: string
-          provider?: string | null
-        }
-        Update: {
-          created_at?: string
-          event_id?: string
-          id?: string
-          model?: string | null
-          prompt_text?: string
-          provider?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "prompts_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-        ]
       }
     }
     Views: {
