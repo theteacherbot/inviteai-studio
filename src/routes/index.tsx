@@ -10,9 +10,9 @@ import { ResultView } from "@/components/ResultView";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "INVITAIA · Design Generator" },
+      { title: "INVITAIA · Studio" },
       { name: "description", content: "Crea invitaciones profesionales impulsadas por IA en segundos." },
-      { property: "og:title", content: "INVITAIA · Design Generator" },
+      { property: "og:title", content: "INVITAIA · Studio" },
       { property: "og:description", content: "Invitaciones premium generadas con IA: JSON, prompt, QR y PDF." },
     ],
     links: [
