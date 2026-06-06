@@ -1,7 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import type { EventTemplate } from "./event-templates";
 
-export interface InvitationDB {
+export interface ProjectDB {
   id: string;
   event_type_slug: string;
   event_type_name: string;
@@ -12,16 +12,23 @@ export interface InvitationDB {
 
 export interface PromptDB {
   id: string;
-  event_id: string;
+  project_id: string;
   prompt_text: string;
   provider: string | null;
   model: string | null;
   created_at: string;
 }
 
+export interface JsonDB {
+  id: string;
+  project_id: string;
+  w4h1: Record<string, unknown>;
+  created_at: string;
+}
+
 export interface GeneratedImageDB {
   id: string;
-  event_id: string;
+  project_id: string;
   prompt_id: string | null;
   url: string;
   provider: string | null;
@@ -30,7 +37,7 @@ export interface GeneratedImageDB {
 
 export interface GeneratedQrDB {
   id: string;
-  event_id: string;
+  project_id: string;
   payload: Record<string, unknown>;
   data_url: string;
   created_at: string;
@@ -44,8 +51,9 @@ export interface SaveInvitationInput {
 }
 
 export interface SaveInvitationResult {
-  event: InvitationDB;
+  project: ProjectDB;
   prompt: PromptDB;
+  json: JsonDB;
   qr: GeneratedQrDB | null;
 }
 
@@ -58,8 +66,8 @@ export async function saveInvitation({
   const w4h1 = template.buildW4H1(data);
   const promptText = template.buildPrompt(data);
 
-  const { data: event, error: eventErr } = await supabase
-    .from("events")
+  const { data: project, error: projectErr } = await supabase
+    .from("projects")
     .insert({
       event_type_slug: template.id,
       event_type_name: template.name,
@@ -68,12 +76,12 @@ export async function saveInvitation({
     })
     .select()
     .single();
-  if (eventErr) throw eventErr;
+  if (projectErr) throw projectErr;
 
   const { data: prompt, error: promptErr } = await supabase
-    .from("prompts")
+    .from("generated_prompts")
     .insert({
-      event_id: event.id,
+      project_id: project.id,
       prompt_text: promptText,
       provider: "pending",
       model: null,
@@ -82,30 +90,41 @@ export async function saveInvitation({
     .single();
   if (promptErr) throw promptErr;
 
+  const { data: jsonRow, error: jsonErr } = await supabase
+    .from("generated_jsons")
+    .insert({
+      project_id: project.id,
+      w4h1: w4h1 as never,
+    })
+    .select()
+    .single();
+  if (jsonErr) throw jsonErr;
+
   let qr: GeneratedQrDB | null = null;
   if (qrPayload && qrDataUrl) {
     const { data: qrRow, error: qrErr } = await supabase
       .from("generated_qrs")
       .insert({
-        event_id: event.id,
+        project_id: project.id,
         payload: qrPayload as never,
         data_url: qrDataUrl,
       })
       .select()
       .single();
     if (qrErr) throw qrErr;
-    qr = qrRow as GeneratedQrDB;
+    qr = qrRow as unknown as GeneratedQrDB;
   }
 
   return {
-    event: event as InvitationDB,
-    prompt: prompt as PromptDB,
+    project: project as unknown as ProjectDB,
+    prompt: prompt as unknown as PromptDB,
+    json: jsonRow as unknown as JsonDB,
     qr,
   };
 }
 
 export async function saveGeneratedImage(input: {
-  eventId: string;
+  projectId: string;
   promptId?: string | null;
   url: string;
   provider?: string;
@@ -113,7 +132,7 @@ export async function saveGeneratedImage(input: {
   const { data, error } = await supabase
     .from("generated_images")
     .insert({
-      event_id: input.eventId,
+      project_id: input.projectId,
       prompt_id: input.promptId ?? null,
       url: input.url,
       provider: input.provider ?? null,
@@ -121,5 +140,45 @@ export async function saveGeneratedImage(input: {
     .select()
     .single();
   if (error) throw error;
-  return data as GeneratedImageDB;
+  return data as unknown as GeneratedImageDB;
+}
+
+export async function listProjects(): Promise<ProjectDB[]> {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  return (data ?? []) as unknown as ProjectDB[];
+}
+
+export async function getProject(id: string): Promise<ProjectDB> {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (error) throw error;
+  return data as unknown as ProjectDB;
+}
+
+export async function deleteProject(id: string): Promise<void> {
+  const { error } = await supabase.from("projects").delete().eq("id", id);
+  if (error) throw error;
+}
+
+export async function duplicateProject(id: string): Promise<ProjectDB> {
+  const original = await getProject(id);
+  const { data, error } = await supabase
+    .from("projects")
+    .insert({
+      event_type_slug: original.event_type_slug,
+      event_type_name: original.event_type_name,
+      form_data: original.form_data as never,
+      w4h1: original.w4h1 as never,
+    })
+    .select()
+    .single();
+  if (error) throw error;
+  return data as unknown as ProjectDB;
 }
