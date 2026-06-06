@@ -74,7 +74,7 @@ export function ResultView({ template, data, onBack }: Props) {
     pdf.setFont("helvetica", "normal");
     pdf.setTextColor(180, 140, 60);
     pdf.setFontSize(11);
-    pdf.text("INVITAIA · DESIGN GENERATOR", w / 2, 60, { align: "center" });
+    pdf.text("INVITAIA · STUDIO", w / 2, 60, { align: "center" });
 
     pdf.setTextColor(15, 15, 15);
     pdf.setFont("helvetica", "bold");
