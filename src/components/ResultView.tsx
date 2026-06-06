@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import type { EventTemplate } from "@/lib/event-templates";
+import { saveInvitation } from "@/lib/invitations-service";
 
 interface Props {
   template: EventTemplate;
@@ -16,23 +17,41 @@ export function ResultView({ template, data, onBack }: Props) {
   const w4h1 = template.buildW4H1(data);
   const prompt = template.buildPrompt(data);
   const [qrUrl, setQrUrl] = useState<string>("");
+  const [savedId, setSavedId] = useState<string | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const qrPayload = JSON.stringify({
+  const qrPayload = {
     rsvp: true,
     whatsapp: data.whatsapp || null,
     instagram: data.instagram || null,
     evento: template.name,
     fecha: data.fecha,
-  });
+  };
+  const qrPayloadString = JSON.stringify(qrPayload);
 
   useEffect(() => {
-    QRCode.toDataURL(qrPayload, {
+    QRCode.toDataURL(qrPayloadString, {
       width: 512,
       margin: 1,
       color: { dark: "#111111", light: "#FFFFFF" },
     }).then(setQrUrl);
-  }, [qrPayload]);
+  }, [qrPayloadString]);
+
+  // Persist invitation once QR is ready
+  useEffect(() => {
+    if (!qrUrl || savedId) return;
+    saveInvitation({ template, data, qrPayload, qrDataUrl: qrUrl })
+      .then((res) => {
+        setSavedId(res.event.id);
+        toast.success("Invitación guardada en tu biblioteca");
+      })
+      .catch((err) => {
+        console.error("save invitation failed", err);
+        toast.error("No se pudo guardar la invitación");
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qrUrl]);
+
 
   const copy = async (text: string, label: string) => {
     await navigator.clipboard.writeText(text);
