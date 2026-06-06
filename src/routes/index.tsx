@@ -46,7 +46,7 @@ function Index() {
           <span className="font-display text-lg font-semibold tracking-tight">INVITAIA</span>
         </div>
         <nav className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Design Generator
+          Studio
         </nav>
       </header>
 
