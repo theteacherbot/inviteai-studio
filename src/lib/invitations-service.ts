@@ -88,7 +88,7 @@ export async function saveInvitation({
       .from("generated_qrs")
       .insert({
         event_id: event.id,
-        payload: qrPayload,
+        payload: qrPayload as never,
         data_url: qrDataUrl,
       })
       .select()
