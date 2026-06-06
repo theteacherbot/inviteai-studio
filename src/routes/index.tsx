@@ -130,7 +130,7 @@ function Index() {
       </main>
 
       <footer className="border-t py-8 text-center text-xs text-muted-foreground">
-        © INVITAIA · Diseño premium con IA
+        © INVITAIA · Studio
       </footer>
     </div>
   );
