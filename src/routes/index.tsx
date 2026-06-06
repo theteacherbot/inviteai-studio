@@ -10,9 +10,9 @@ import { ResultView } from "@/components/ResultView";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "INVITAIA · Design Generator" },
+      { title: "INVITAIA · Studio" },
       { name: "description", content: "Crea invitaciones profesionales impulsadas por IA en segundos." },
-      { property: "og:title", content: "INVITAIA · Design Generator" },
+      { property: "og:title", content: "INVITAIA · Studio" },
       { property: "og:description", content: "Invitaciones premium generadas con IA: JSON, prompt, QR y PDF." },
     ],
     links: [
@@ -46,7 +46,7 @@ function Index() {
           <span className="font-display text-lg font-semibold tracking-tight">INVITAIA</span>
         </div>
         <nav className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          Design Generator
+          Studio
         </nav>
       </header>
 
@@ -58,7 +58,7 @@ function Index() {
                 Powered by AI
               </span>
               <h1 className="mt-6 font-display text-5xl font-bold leading-[1.05] sm:text-6xl">
-                INVITAIA <span className="text-gold">Design</span> Generator
+                INVITAIA <span className="text-gold">Studio</span>
               </h1>
               <p className="mx-auto mt-5 max-w-xl text-lg text-muted-foreground">
                 Crea invitaciones profesionales impulsadas por IA. Elige el tipo de evento para comenzar.
@@ -130,7 +130,7 @@ function Index() {
       </main>
 
       <footer className="border-t py-8 text-center text-xs text-muted-foreground">
-        © INVITAIA · Diseño premium con IA
+        © INVITAIA · Studio
       </footer>
     </div>
   );
