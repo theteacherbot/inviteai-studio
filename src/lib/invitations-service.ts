@@ -152,6 +152,27 @@ export async function listProjects(): Promise<ProjectDB[]> {
   return (data ?? []) as unknown as ProjectDB[];
 }
 
+export interface ProjectWithCoverDB extends ProjectDB {
+  cover_url: string | null;
+}
+
+export async function listProjectsWithCover(): Promise<ProjectWithCoverDB[]> {
+  const { data, error } = await supabase
+    .from("projects")
+    .select("*, generated_images(url, created_at)")
+    .order("created_at", { ascending: false });
+  if (error) throw error;
+  type Row = ProjectDB & { generated_images?: Array<{ url: string; created_at: string }> };
+  return (data ?? []).map((row: Row) => {
+    const imgs = row.generated_images ?? [];
+    const latest = imgs.length
+      ? [...imgs].sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0]
+      : null;
+    const { generated_images: _omit, ...project } = row;
+    return { ...(project as ProjectDB), cover_url: latest?.url ?? null };
+  });
+}
+
 export async function getProject(id: string): Promise<ProjectDB> {
   const { data, error } = await supabase
     .from("projects")
