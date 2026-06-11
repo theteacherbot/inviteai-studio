@@ -129,6 +129,26 @@ export function ResultView({ template, data, onBack }: Props) {
             {template.name}
           </div>
           <div className="h-px w-16 bg-gold" />
+          {imageStatus === "loading" && (
+            <div className="flex h-48 w-48 animate-pulse items-center justify-center rounded-xl bg-muted text-xs text-muted-foreground">
+              Generando imagen…
+            </div>
+          )}
+          {imageStatus === "ready" && image && (
+            <div className="flex flex-col items-center gap-2">
+              <img
+                src={image.url}
+                alt={`Imagen generada para ${template.name}`}
+                className="h-56 w-56 rounded-xl border object-cover shadow-sm"
+              />
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                Provider: {image.provider ?? "mock"}
+              </p>
+            </div>
+          )}
+          {imageStatus === "error" && (
+            <p className="text-xs text-destructive">No se pudo generar la imagen</p>
+          )}
           <h2 className="font-display text-4xl font-semibold">
             {data.nombre || data.novia || "Tu evento"}
             {data.novio && <> <span className="text-gold">&</span> {data.novio}</>}
