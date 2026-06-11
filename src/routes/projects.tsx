@@ -7,8 +7,8 @@ import { toast } from "sonner";
 import {
   deleteProject,
   duplicateProject,
-  listProjects,
-  type ProjectDB,
+  listProjectsWithCover,
+  type ProjectWithCoverDB,
 } from "@/lib/invitations-service";
 import { getTemplate } from "@/lib/event-templates";
 
@@ -24,10 +24,10 @@ export const Route = createFileRoute("/projects")({
 
 function ProjectsPage() {
   const navigate = useNavigate();
-  const [projects, setProjects] = useState<ProjectDB[] | null>(null);
+  const [projects, setProjects] = useState<ProjectWithCoverDB[] | null>(null);
 
   const refresh = () => {
-    listProjects()
+    listProjectsWithCover()
       .then(setProjects)
       .catch((e) => {
         console.error(e);
@@ -38,7 +38,7 @@ function ProjectsPage() {
 
   useEffect(refresh, []);
 
-  const onView = (p: ProjectDB) => {
+  const onView = (p: ProjectWithCoverDB) => {
     sessionStorage.setItem(
       "invitaia:prefill",
       JSON.stringify({ templateId: p.event_type_slug, data: p.form_data, step: "result" }),
@@ -46,7 +46,7 @@ function ProjectsPage() {
     navigate({ to: "/" });
   };
 
-  const onDuplicate = async (p: ProjectDB) => {
+  const onDuplicate = async (p: ProjectWithCoverDB) => {
     try {
       await duplicateProject(p.id);
       toast.success("Proyecto duplicado");
@@ -57,7 +57,7 @@ function ProjectsPage() {
     }
   };
 
-  const onDelete = async (p: ProjectDB) => {
+  const onDelete = async (p: ProjectWithCoverDB) => {
     if (!confirm(`¿Eliminar "${p.event_type_name}"?`)) return;
     try {
       await deleteProject(p.id);
@@ -118,7 +118,20 @@ function ProjectsPage() {
                 p.form_data?.titulo ||
                 p.event_type_name;
               return (
-                <Card key={p.id} className="flex flex-col p-5">
+                <Card key={p.id} className="flex flex-col overflow-hidden p-0">
+                  {p.cover_url ? (
+                    <img
+                      src={p.cover_url}
+                      alt={title}
+                      className="h-40 w-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <div className="flex h-40 w-full items-center justify-center bg-muted text-4xl">
+                      {t?.icon ?? "✨"}
+                    </div>
+                  )}
+                  <div className="flex flex-1 flex-col p-5">
                   <div className="flex items-start justify-between">
                     <div className="text-3xl">{t?.icon ?? "✨"}</div>
                     <span className="text-[10px] uppercase tracking-wider text-muted-foreground">
@@ -141,6 +154,7 @@ function ProjectsPage() {
                     <Button size="sm" variant="ghost" onClick={() => onDelete(p)} className="text-destructive hover:text-destructive">
                       Eliminar
                     </Button>
+                  </div>
                   </div>
                 </Card>
               );
