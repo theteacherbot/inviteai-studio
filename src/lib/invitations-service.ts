@@ -157,18 +157,19 @@ export interface ProjectWithCoverDB extends ProjectDB {
 }
 
 export async function listProjectsWithCover(): Promise<ProjectWithCoverDB[]> {
+  // Fetch only the most recent image per project directly from PostgREST
+  // by ordering the embedded resource and limiting it to 1 row.
   const { data, error } = await supabase
     .from("projects")
     .select("*, generated_images(url, created_at)")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .order("created_at", { foreignTable: "generated_images", ascending: false })
+    .limit(1, { foreignTable: "generated_images" });
   if (error) throw error;
   type Row = ProjectDB & { generated_images?: Array<{ url: string; created_at: string }> };
   return (data ?? []).map((row) => {
     const r = row as unknown as Row;
-    const imgs = r.generated_images ?? [];
-    const latest = imgs.length
-      ? [...imgs].sort((a, b) => (a.created_at < b.created_at ? 1 : -1))[0]
-      : null;
+    const latest = r.generated_images?.[0] ?? null;
     const { generated_images: _omit, ...project } = r;
     return { ...(project as ProjectDB), cover_url: latest?.url ?? null };
   });

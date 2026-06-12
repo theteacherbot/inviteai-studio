@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { generateAndSaveImage } from "@/lib/image-service";
 import type { GeneratedImageDB } from "@/lib/invitations-service";
 
@@ -16,9 +16,15 @@ export function useGeneratedImage({ projectId, promptId, prompt, providerId, met
   const [status, setStatus] = useState<Status>("idle");
   const [image, setImage] = useState<GeneratedImageDB | null>(null);
   const [error, setError] = useState<Error | null>(null);
+  // Guard against duplicate inserts from StrictMode double-mount or remounts.
+  // Tracks which projectIds have already been requested in this browser session.
+  const requestedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     if (!projectId) return;
+    if (requestedRef.current.has(projectId)) return;
+    requestedRef.current.add(projectId);
+
     let cancelled = false;
     setStatus("loading");
     generateAndSaveImage({ projectId, promptId, prompt, providerId, metadata })
@@ -30,6 +36,8 @@ export function useGeneratedImage({ projectId, promptId, prompt, providerId, met
       .catch((err: unknown) => {
         if (cancelled) return;
         console.error("generateAndSaveImage failed", err);
+        // Allow a retry on real failures (next remount can try again).
+        requestedRef.current.delete(projectId);
         setError(err instanceof Error ? err : new Error(String(err)));
         setStatus("error");
       });
