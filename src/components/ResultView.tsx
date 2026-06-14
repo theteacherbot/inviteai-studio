@@ -74,7 +74,19 @@ export function ResultView({ template, data, onBack }: Props) {
     a.click();
   };
 
-  const downloadPDF = () => {
+  const fetchAsDataUrl = async (url: string): Promise<string> => {
+    const res = await fetch(url, { mode: "cors" });
+    if (!res.ok) throw new Error(`fetch failed: ${res.status}`);
+    const blob = await res.blob();
+    return await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result));
+      reader.onerror = () => reject(reader.error);
+      reader.readAsDataURL(blob);
+    });
+  };
+
+  const buildLegacyPDF = () => {
     const pdf = new jsPDF({ unit: "pt", format: "a4" });
     const w = pdf.internal.pageSize.getWidth();
     pdf.setFillColor(255, 255, 255);
@@ -115,6 +127,67 @@ export function ResultView({ template, data, onBack }: Props) {
     pdf.text("Escanea para confirmar asistencia", w / 2, y + 170, { align: "center" });
 
     pdf.save(`invitacion-${template.id}.pdf`);
+  };
+
+  const buildImagePDF = async (imageDataUrl: string) => {
+    const pdf = new jsPDF({ unit: "pt", format: "a4" });
+    const pageW = pdf.internal.pageSize.getWidth();
+    const pageH = pdf.internal.pageSize.getHeight();
+
+    pdf.setFillColor(255, 255, 255);
+    pdf.rect(0, 0, pageW, pageH, "F");
+
+    // Image ~70% of upper page
+    const imgH = pageH * 0.7;
+    const imgW = pageW;
+    pdf.addImage(imageDataUrl, "JPEG", 0, 0, imgW, imgH, undefined, "FAST");
+
+    // Event data below image
+    let y = imgH + 28;
+    pdf.setFont("helvetica", "bold");
+    pdf.setTextColor(15, 15, 15);
+    pdf.setFontSize(18);
+    pdf.text(template.name.toUpperCase(), pageW / 2, y, { align: "center" });
+    y += 18;
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(11);
+    pdf.setTextColor(60, 60, 60);
+    const lineParts: string[] = [];
+    if (data.nombre) lineParts.push(data.nombre);
+    if (data.novia && data.novio) lineParts.push(`${data.novia} & ${data.novio}`);
+    if (data.fecha) lineParts.push(data.fecha);
+    if (data.hora) lineParts.push(data.hora);
+    if (data.lugar) lineParts.push(data.lugar);
+    if (lineParts.length) {
+      pdf.text(lineParts.join(" · "), pageW / 2, y, { align: "center", maxWidth: pageW - 80 });
+      y += 16;
+    }
+
+    // QR bottom
+    if (qrUrl) {
+      const qrSize = 90;
+      pdf.addImage(qrUrl, "PNG", pageW / 2 - qrSize / 2, pageH - qrSize - 40, qrSize, qrSize);
+      pdf.setFontSize(9);
+      pdf.setTextColor(120, 120, 120);
+      pdf.text("Escanea para confirmar asistencia", pageW / 2, pageH - 20, { align: "center" });
+    }
+
+    pdf.save(`invitacion-${template.id}.pdf`);
+  };
+
+  const downloadPDF = async () => {
+    if (imageStatus === "ready" && image?.url) {
+      try {
+        const dataUrl = await fetchAsDataUrl(image.url);
+        await buildImagePDF(dataUrl);
+        return;
+      } catch (err) {
+        console.error("PDF with image failed, falling back", err);
+        toast.error("No se pudo incluir la imagen, usando PDF estándar");
+      }
+    }
+    buildLegacyPDF();
   };
 
   return (
