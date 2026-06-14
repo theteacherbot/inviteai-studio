@@ -13,14 +13,24 @@ export interface GenerateAndSaveImageInput {
 export async function generateAndSaveImage(
   input: GenerateAndSaveImageInput,
 ): Promise<GeneratedImageDB> {
+  console.log("[generateAndSaveImage] input", {
+    projectId: input.projectId,
+    promptId: input.promptId,
+    providerId: input.providerId,
+    promptPreview: input.prompt?.slice(0, 80),
+  });
   const provider = getImageProvider(input.providerId);
+  console.log("[generateAndSaveImage] resolved provider", provider?.id);
   const { url, provider: providerName } = await provider.generate(input.prompt, {
     metadata: input.metadata,
   });
-  return saveGeneratedImage({
+  console.log("[generateAndSaveImage] provider returned", { url, providerName });
+  const row = await saveGeneratedImage({
     projectId: input.projectId,
     promptId: input.promptId ?? null,
     url,
     provider: providerName,
   });
+  console.log("[generateAndSaveImage] saved row", row);
+  return row;
 }
