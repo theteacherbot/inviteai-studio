@@ -21,29 +21,19 @@ export function useGeneratedImage({ projectId, promptId, prompt, providerId, met
   const requestedRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    console.log("[useGeneratedImage] effect fired", { projectId, promptId, providerId, promptLen: prompt?.length });
-    if (!projectId) {
-      console.log("[useGeneratedImage] skip: no projectId");
-      return;
-    }
-    if (requestedRef.current.has(projectId)) {
-      console.log("[useGeneratedImage] skip: already requested", projectId);
-      return;
-    }
+    if (!projectId) return;
+    if (requestedRef.current.has(projectId)) return;
     requestedRef.current.add(projectId);
 
     let cancelled = false;
     setStatus("loading");
-    console.log("[useGeneratedImage] calling generateAndSaveImage", { projectId, promptId });
     generateAndSaveImage({ projectId, promptId, prompt, providerId, metadata })
       .then((row) => {
-        console.log("[useGeneratedImage] success", { cancelled, row });
         if (cancelled) return;
         setImage(row);
         setStatus("ready");
       })
       .catch((err: unknown) => {
-        console.error("[useGeneratedImage] generateAndSaveImage failed", err);
         if (cancelled) return;
         requestedRef.current.delete(projectId);
         setError(err instanceof Error ? err : new Error(String(err)));
