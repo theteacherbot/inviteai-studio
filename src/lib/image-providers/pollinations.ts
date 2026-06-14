@@ -5,10 +5,12 @@ import type { GenerateImageOptions, ImageProvider } from "./types";
  * Docs: https://image.pollinations.ai
  *
  * The endpoint returns the image bytes directly from the URL, so the URL
- * itself is the persistable artifact. We perform a lightweight validation
- * fetch to surface rate-limits / server errors as a thrown error, which
- * the hook layer (`useGeneratedImage`) turns into the "error" UI state
- * and allows a retry on remount.
+ * itself is the persistable artifact. We do NOT pre-fetch here:
+ *  - Pollinations holds the connection open for 15-60s while generating,
+ *    which would block `saveGeneratedImage` and risk being cancelled by
+ *    React StrictMode unmounts before the INSERT runs.
+ *  - The browser will load the URL via <img>, so load/error handling is
+ *    delegated to the component (onLoad / onError).
  */
 
 const BASE_URL = "https://image.pollinations.ai/prompt";
@@ -39,30 +41,6 @@ export const PollinationsProvider: ImageProvider = {
   async generate(prompt: string, options?: GenerateImageOptions) {
     const meta = (options?.metadata ?? {}) as PollinationsMetadata;
     const url = buildUrl(prompt, meta);
-
-    // Validate availability (rate-limits return 429, server errors return 5xx).
-    // Pollinations serves images with permissive CORS so this works in-browser.
-    let res: Response;
-    try {
-      res = await fetch(url, { method: "GET", mode: "cors" });
-    } catch (err) {
-      console.error("[pollinations] network error", err);
-      throw new Error(
-        `Pollinations no está disponible (network): ${
-          err instanceof Error ? err.message : String(err)
-        }`,
-      );
-    }
-
-    if (!res.ok) {
-      const reason =
-        res.status === 429
-          ? "rate limit alcanzado"
-          : `error ${res.status} ${res.statusText}`;
-      console.error("[pollinations] generation failed", { url, status: res.status });
-      throw new Error(`Pollinations falló: ${reason}`);
-    }
-
     return { url, provider: "pollinations" };
   },
 };
