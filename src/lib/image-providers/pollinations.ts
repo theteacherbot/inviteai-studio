@@ -20,6 +20,7 @@ interface PollinationsMetadata {
   height?: number;
   seed?: number | string;
   model?: string;
+  apiKey?: string;
   nologo?: boolean;
   enhance?: boolean;
 }
@@ -31,6 +32,7 @@ function buildUrl(prompt: string, meta: PollinationsMetadata = {}): string {
   params.set("height", String(meta.height ?? 1000));
   params.set("model", String(meta.model ?? "flux"));
   params.set("nologo", String(meta.nologo ?? true));
+  if (meta.apiKey?.trim()) params.set("apikey", meta.apiKey.trim());
   if (meta.enhance) params.set("enhance", "true");
   if (meta.seed !== undefined) params.set("seed", String(meta.seed));
   return `${BASE_URL}/${encoded}?${params.toString()}`;

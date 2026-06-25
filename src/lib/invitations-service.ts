@@ -63,15 +63,18 @@ export async function saveInvitation({
   qrPayload,
   qrDataUrl,
 }: SaveInvitationInput): Promise<SaveInvitationResult> {
-  const w4h1 = template.buildW4H1(data);
-  const promptText = template.buildPrompt(data);
+  const safeData = { ...data };
+  delete safeData.pollinationsApiKey;
+
+  const w4h1 = template.buildW4H1(safeData);
+  const promptText = template.buildPrompt(safeData);
 
   const { data: project, error: projectErr } = await supabase
     .from("projects")
     .insert({
       event_type_slug: template.id,
       event_type_name: template.name,
-      form_data: data as never,
+      form_data: safeData as never,
       w4h1: w4h1 as never,
     })
     .select()

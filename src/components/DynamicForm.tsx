@@ -34,6 +34,23 @@ export function DynamicForm({ template, onSubmit }: Props) {
               value={data[f.name] || ""}
               onChange={(e) => setData({ ...data, [f.name]: e.target.value })}
             />
+          ) : f.type === "select" ? (
+            <select
+              id={f.name}
+              required={f.required}
+              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              value={data[f.name] || ""}
+              onChange={(e) => setData({ ...data, [f.name]: e.target.value })}
+            >
+              <option value="" disabled>
+                {f.placeholder || "Selecciona una opción"}
+              </option>
+              {(f.options || []).map((option) => (
+                <option key={`${f.name}-${option.value}`} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           ) : (
             <Input
               id={f.name}
