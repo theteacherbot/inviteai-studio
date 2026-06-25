@@ -1,0 +1,1767 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INVITEAI Studio</title>
+  <meta name="description" content="Punto de entrada de INVITEAI Studio." />
+  <meta http-equiv="refresh" content="0; url=https://theteacherbot.github.io/invitaia-studio/" />
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #1f1f1f;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 520px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+    }
+    a {
+      color: #0a66c2;
+    }
+  </style>
+</head>
+<body>
+  <main class="card">
+    <h1>INVITEAI Studio</h1>
+    <p>Redirigiendo al sitio activo...</p>
+    <p>
+      Si no redirige automáticamente, abre
+      <a href="https://theteacherbot.github.io/invitaia-studio/">INVITAIA Studio</a>.
+    </p>
+  </main>
+</body>
+</html><!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INVITAIA · Studio</title>
+    <meta name="description" content="Crea invitaciones profesionales impulsadas por IA en segundos.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Supabase Client local bundle -->
+    <script src="vendor/supabase.umd.js"></script>
+    <!-- Configuración de Supabase (cargar antes del script principal) -->
+    <script src="config.js"></script>
+    <!-- QRCode local bundle -->
+    <script src="vendor/qrcode.min.js"></script>
+    <!-- jsPDF local bundle -->
+    <script src="vendor/jspdf.umd.min.js"></script>
+    <!-- html2canvas local bundle -->
+    <script src="vendor/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --radius: 0.875rem;
+            --background: #FFFFFF;
+            --foreground: #262626;
+            --card: #FFFFFF;
+            --card-foreground: #262626;
+            --primary: #262626;
+            --primary-foreground: #FAFAFA;
+            --secondary: #F7F7F7;
+            --secondary-foreground: #262626;
+            --muted: #F5F5F5;
+            --muted-foreground: #737373;
+            --accent: #F5F5DC;
+            --accent-foreground: #262626;
+            --gold: #D4AF37;
+            --gold-foreground: #262626;
+            --destructive: #DC2626;
+            --destructive-foreground: #FAFAFA;
+            --border: #EBEBEB;
+            --input: #EBEBEB;
+            --ring: #D4AF37;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: radial-gradient(ellipse at top, #FAFAFA 0%, #FFFFFF 60%);
+            color: var(--foreground);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Poppins', system-ui, sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.25rem;
+            height: 2.25rem;
+            background: var(--foreground);
+            color: var(--background);
+            border-radius: 0.5rem;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 700;
+        }
+
+        .logo-text {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.125rem;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--muted-foreground);
+        }
+
+        nav a {
+            color: var(--muted-foreground);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        nav a:hover, nav a.active {
+            color: var(--foreground);
+        }
+
+        main {
+            padding: 0 0 6rem;
+        }
+
+        .hero {
+            text-align: center;
+            max-width: 32rem;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+            background: rgba(212, 175, 55, 0.1);
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            line-height: 1.05;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero h1 .gold {
+            color: var(--gold);
+        }
+
+        .hero p {
+            font-size: 1.125rem;
+            color: var(--muted-foreground);
+            margin: 0 auto;
+        }
+
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            gap: 1.25rem;
+            margin-top: 3.5rem;
+        }
+
+        @media (min-width: 640px) {
+            .templates-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .templates-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        .template-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1.5rem;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .template-card:hover {
+            transform: translateY(-0.25rem);
+            box-shadow: 0 20px 60px -20px rgba(38, 38, 38, 0.18);
+        }
+
+        .template-card.selected {
+            border-color: var(--gold);
+            box-shadow: 0 10px 40px -10px rgba(212, 175, 55, 0.4), 0 0 0 2px var(--gold);
+        }
+
+        .template-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 3.5rem;
+            height: 3.5rem;
+            background: var(--muted);
+            border-radius: 0.75rem;
+            font-size: 1.875rem;
+            transition: background-color 0.2s;
+        }
+
+        .template-card.selected .template-icon {
+            background: rgba(212, 175, 55, 0.15);
+        }
+
+        .template-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .template-card p {
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+        }
+
+        .template-indicator {
+            position: absolute;
+            top: 1.25rem;
+            right: 1.25rem;
+            width: 0.625rem;
+            height: 0.625rem;
+            border-radius: 50%;
+            background: var(--border);
+            transition: background-color 0.2s;
+        }
+
+        .template-card.selected .template-indicator {
+            background: var(--gold);
+        }
+
+        .continue-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 12.5rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--foreground);
+            color: var(--background);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 2.5rem;
+        }
+
+        .continue-btn:hover:not(:disabled) {
+            background: rgba(38, 38, 38, 0.9);
+        }
+
+        .continue-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .form-section {
+            max-width: 48rem;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .back-btn {
+            display: inline-block;
+            padding: 0.5rem 0;
+            margin-bottom: 1.5rem;
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .back-btn:hover {
+            color: var(--foreground);
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+        }
+
+        .form-header .template-name {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            color: var(--gold);
+        }
+
+        .form-header h2 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .form-header p {
+            color: var(--muted-foreground);
+            margin-top: 0.5rem;
+        }
+
+        .form-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 20px 60px -20px rgba(38, 38, 38, 0.18);
+        }
+
+        @media (min-width: 640px) {
+            .form-card {
+                padding: 2rem;
+            }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.25rem;
+        }
+
+        @media (min-width: 640px) {
+            .form-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .form-group label .required {
+            color: var(--gold);
+            margin-left: 0.25rem;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: 0.625rem;
+            border: 1px solid var(--input);
+            border-radius: 0.375rem;
+            font-family: inherit;
+            font-size: 0.875rem;
+            background: var(--background);
+            color: var(--foreground);
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--ring);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            background: var(--foreground);
+            color: var(--background);
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .submit-btn:hover {
+            background: rgba(38, 38, 38, 0.9);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            padding-top: 0.5rem;
+        }
+
+        footer {
+            border-top: 1px solid var(--border);
+            padding: 2rem 0;
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .result-section {
+            max-width: 80rem;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .result-section.active {
+            display: block;
+        }
+
+        .result-header {
+            margin-bottom: 2rem;
+        }
+
+        .result-header .badge {
+            margin-bottom: 0.5rem;
+        }
+
+        .result-header h2 {
+            font-size: 1.875rem;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 1024px) {
+            .result-grid {
+                grid-template-columns: 1.1fr 1fr;
+            }
+        }
+
+        .invitation-preview {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            overflow: hidden;
+        }
+
+        .invitation-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            min-height: 40rem;
+            padding: 2.5rem;
+            background: linear-gradient(to bottom, white, rgba(245, 245, 220, 0.4));
+            text-align: center;
+        }
+
+        .invitation-card .event-type {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3em;
+            color: var(--gold);
+        }
+
+        .invitation-card .divider {
+            width: 4rem;
+            height: 1px;
+            background: var(--gold);
+        }
+
+        .invitation-card h2 {
+            font-size: 2.25rem;
+            font-weight: 600;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .invitation-card .gold {
+            color: var(--gold);
+        }
+
+        .invitation-card .details {
+            display: grid;
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--muted-foreground);
+        }
+
+        .invitation-card .details .main-detail {
+            font-size: 1rem;
+            color: var(--foreground);
+        }
+
+        .invitation-card .qr-placeholder {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .invitation-card .qr-placeholder img {
+            width: 8rem;
+            height: 8rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border);
+            background: white;
+            padding: 0.5rem;
+        }
+
+        .invitation-card .qr-placeholder span {
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+        }
+
+        .result-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--input);
+            background: var(--background);
+            color: var(--foreground);
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--accent);
+        }
+
+        .action-btn.primary {
+            background: var(--foreground);
+            color: var(--background);
+            border-color: var(--foreground);
+        }
+
+        .action-btn.primary:hover {
+            background: rgba(38, 38, 38, 0.9);
+        }
+
+        .code-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 1rem;
+            padding: 1.25rem;
+        }
+
+        .code-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .code-card-header h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted-foreground);
+        }
+
+        .code-card pre {
+            background: var(--muted);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.75rem;
+            line-height: 1.625;
+            max-height: 18rem;
+            overflow: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .code-card p {
+            background: var(--muted);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            font-size: 0.875rem;
+            line-height: 1.571;
+        }
+
+        .code-card .note {
+            margin-top: 0.75rem;
+            font-size: 0.75rem;
+            color: var(--muted-foreground);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">iA</div>
+                <span class="logo-text">INVITAIA</span>
+            </div>
+            <nav id="nav-bar">
+                <a href="#" id="nav-studio" class="active" onclick="goToStudio(event)">Studio</a>
+                <a href="#" id="nav-projects" onclick="showProjects(event)">Mis Proyectos</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Selección de plantilla -->
+            <section id="select-section" class="hero">
+                <span class="badge">Powered by AI</span>
+                <h1>INVITAIA <span class="gold">Studio</span></h1>
+                <p>Crea invitaciones profesionales impulsadas por IA. Elige el tipo de evento para comenzar.</p>
+                
+                <div class="templates-grid" id="templates-grid">
+                    <!-- Las tarjetas se generan con JavaScript -->
+                </div>
+
+                <button class="continue-btn" id="continue-btn" disabled>
+                    Continuar →
+                </button>
+            </section>
+
+            <!-- Formulario -->
+            <section id="form-section" class="form-section">
+                <button class="back-btn" onclick="goToSelect()">← Cambiar tipo de evento</button>
+                
+                <div class="form-header">
+                    <div class="template-name" id="form-template-name"></div>
+                    <h2>Completa los detalles</h2>
+                    <p>Estos datos generarán automáticamente el JSON, prompt, QR y PDF.</p>
+                </div>
+
+                <div class="form-card">
+                    <form id="invitation-form" class="form-grid" onsubmit="submitForm(event)">
+                        <!-- Los campos se generan dinámicamente -->
+                    </form>
+                </div>
+            </section>
+
+            <!-- Resultados -->
+            <section id="result-section" class="result-section">
+                <div class="result-header">
+                    <span class="badge">Resultado</span>
+                    <h2>Tu invitación está lista</h2>
+                </div>
+
+                <div class="result-grid">
+                    <!-- Vista previa de la invitación -->
+                    <div class="invitation-preview">
+                        <div class="invitation-card" id="invitation-card">
+                            <!-- Se genera dinámicamente -->
+                        </div>
+                    </div>
+
+                    <!-- Sidebar con acciones y código -->
+                    <div class="result-sidebar">
+                        <div class="action-buttons">
+                            <button class="action-btn primary" onclick="downloadPDF(event)">Descargar PDF</button>
+                            <button class="action-btn" onclick="downloadQR(event)">Descargar QR</button>
+                            <button class="action-btn" onclick="editForm()">← Editar</button>
+                        </div>
+
+                        <div class="code-card">
+                            <div class="code-card-header">
+                                <h3>JSON W4H1</h3>
+                                <button class="action-btn" onclick="copyToClipboard('json')">Copiar</button>
+                            </div>
+                            <pre id="json-output"></pre>
+                        </div>
+
+                        <div class="code-card">
+                            <div class="code-card-header">
+                                <h3>Prompt IA</h3>
+                                <button class="action-btn" onclick="copyToClipboard('prompt')">Copiar</button>
+                            </div>
+                            <p id="prompt-output"></p>
+                            <div class="note">Listo para usar con OpenAI Images, Pollinations, Flux o Ideogram.</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Proyectos -->
+            <section id="projects-section" class="result-section">
+                <div class="result-header">
+                    <span class="badge">Biblioteca</span>
+                    <h2>Mis Proyectos</h2>
+                    <p style="color: var(--muted-foreground); margin-top: 0.5rem;">Todas tus invitaciones guardadas automáticamente en el backend.</p>
+                </div>
+                
+                <div id="projects-loading" style="text-align: center; padding: 2rem; color: var(--muted-foreground);">
+                    Cargando proyectos...
+                </div>
+
+                <div id="projects-empty" class="hidden" style="text-align: center; padding: 4rem 2rem; border: 1px solid var(--border); border-radius: 1rem; background: var(--card); box-shadow: 0 20px 60px -20px rgba(38, 38, 38, 0.18);">
+                    <p style="color: var(--muted-foreground); font-size: 1rem;">Aún no tienes proyectos guardados en el backend.</p>
+                    <button class="continue-btn" onclick="goToStudio(event)" style="margin-top: 1.5rem;">Crear tu primera invitación</button>
+                </div>
+
+                <div id="projects-grid" class="templates-grid" style="margin-top: 2rem;">
+                    <!-- Los proyectos cargados de Supabase se renderizan aquí -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            Herramienta diseñada por el profesor <b>Édgar Herrera Morales</b><br/> con tecnología <b><a href="https://pollinations.ai/play">Pollinations</b></a> y el apoyo de <b>VS Code</b><br/>© INVITAIA · Studio
+        </footer>
+    </div>
+
+    <script>
+        // Plantillas de eventos
+        const EVENT_TEMPLATES = [
+            {
+                id: "cumpleanos",
+                name: "Cumpleaños",
+                description: "Celebra un año más con una invitación memorable.",
+                icon: "🎂",
+                fields: [
+                    { name: "nombre", label: "Nombre", type: "text", required: true },
+                    { name: "edad", label: "Edad", type: "number", required: true },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "lugar", label: "Lugar", type: "text", required: true },
+                    { name: "direccion", label: "Dirección", type: "text", placeholder: "Dirección o link de Google Maps" },
+                    { name: "anfitrion", label: "Organiza", type: "text", placeholder: "Ej: Familia Herrera" },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "tema", label: "Tema", type: "text", placeholder: "Ej: Tropical, Neón" },
+                    { name: "colores", label: "Colores", type: "text", placeholder: "Ej: Dorado y blanco" },
+                    { name: "codigoVestimenta", label: "Código de vestimenta", type: "text", placeholder: "Ej: Casual elegante" },
+                    { name: "notas", label: "Notas adicionales", type: "textarea", placeholder: "Ej: Solo adultos, trae tu regalo" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "matrimonio",
+                name: "Matrimonio",
+                description: "Una invitación elegante para el día más especial.",
+                icon: "💍",
+                fields: [
+                    { name: "novia", label: "Nombre Novia", type: "text", required: true },
+                    { name: "novio", label: "Nombre Novio", type: "text", required: true },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "ceremonia", label: "Ceremonia", type: "text", required: true, placeholder: "Iglesia / lugar" },
+                    { name: "recepcion", label: "Recepción", type: "text", required: true, placeholder: "Salón / lugar" },
+                    { name: "padres", label: "Padres / Padrinos", type: "text", placeholder: "Ej: Familia Pérez y Familia Gómez" },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "codigoVestimenta", label: "Código de vestimenta", type: "text", placeholder: "Ej: Etiqueta rigurosa" },
+                    { name: "mesaRegalos", label: "Mesa de regalos", type: "text", placeholder: "Tienda o link" },
+                    { name: "cuentaRegalo", label: "Cuenta para regalo", type: "text", placeholder: "Banco y número de cuenta (opcional)" },
+                    { name: "mensaje", label: "Mensaje", type: "textarea", placeholder: "Una frase especial para la invitación" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "quince",
+                name: "Quince Años",
+                description: "Diseño sofisticado para una noche inolvidable.",
+                icon: "👑",
+                fields: [
+                    { name: "nombre", label: "Nombre", type: "text", required: true },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "lugar", label: "Lugar", type: "text", required: true },
+                    { name: "padres", label: "Padres", type: "text", placeholder: "Ej: Sr. y Sra. Herrera" },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "tema", label: "Tema", type: "text", placeholder: "Ej: Cenicienta, Hollywood" },
+                    { name: "colores", label: "Colores", type: "text", placeholder: "Ej: Rosado y plata" },
+                    { name: "codigoVestimenta", label: "Código de vestimenta", type: "text", placeholder: "Ej: Formal" },
+                    { name: "corteHonor", label: "Corte de honor", type: "text", placeholder: "Chambelanes / damas (opcional)" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "graduacion",
+                name: "Graduación",
+                description: "Honra un logro académico con estilo.",
+                icon: "🎓",
+                fields: [
+                    { name: "nombre", label: "Nombre del graduado", type: "text", required: true },
+                    { name: "titulo", label: "Título / Grado", type: "text", required: true, placeholder: "Ej: Ingeniería" },
+                    { name: "institucion", label: "Institución", type: "text", required: true },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "lugar", label: "Lugar", type: "text", required: true },
+                    { name: "promocion", label: "Promoción", type: "text", placeholder: "Ej: 2026" },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "codigoVestimenta", label: "Código de vestimenta", type: "text", placeholder: "Ej: Formal" },
+                    { name: "mensaje", label: "Mensaje", type: "textarea", placeholder: "Una frase de felicitación" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "comunion",
+                name: "Primera Comunión",
+                description: "Una invitación serena para un día sagrado.",
+                icon: "🕊️",
+                fields: [
+                    { name: "nombre", label: "Nombre del niño/a", type: "text", required: true },
+                    { name: "parroquia", label: "Parroquia / Iglesia", type: "text", required: true },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "lugarRecepcion", label: "Lugar de la recepción", type: "text", placeholder: "Si es distinto a la iglesia" },
+                    { name: "padres", label: "Padres", type: "text", placeholder: "Ej: Sr. y Sra. Herrera" },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "colores", label: "Colores", type: "text", placeholder: "Ej: Blanco y dorado" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "babyshower",
+                name: "Baby Shower",
+                description: "Da la bienvenida con dulzura y elegancia.",
+                icon: "👶",
+                fields: [
+                    { name: "mama", label: "Nombre de la mamá", type: "text", required: true },
+                    { name: "papa", label: "Nombre del papá", type: "text", placeholder: "Opcional" },
+                    { name: "bebe", label: "Nombre del bebé", type: "text", placeholder: "Si ya tiene nombre" },
+                    { name: "genero", label: "Género", type: "text", placeholder: "Niño / Niña / Sorpresa" },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "lugar", label: "Lugar", type: "text", required: true },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "tema", label: "Tema", type: "text", placeholder: "Ej: Nubes, Safari" },
+                    { name: "colores", label: "Colores", type: "text", placeholder: "Ej: Amarillo y blanco" },
+                    { name: "mesaRegalos", label: "Mesa de regalos", type: "text", placeholder: "Tienda o link" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "aniversario",
+                name: "Aniversario",
+                description: "Conmemora años de amor o historia.",
+                icon: "🥂",
+                fields: [
+                    { name: "personas", label: "Personas / Pareja", type: "text", required: true, placeholder: "Ej: Ana & Luis" },
+                    { name: "anios", label: "Años a celebrar", type: "number", required: true },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "lugar", label: "Lugar", type: "text", required: true },
+                    { name: "tipo", label: "Tipo", type: "text", placeholder: "Bodas / Empresa / Amistad" },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "codigoVestimenta", label: "Código de vestimenta", type: "text", placeholder: "Ej: Elegante" },
+                    { name: "mensaje", label: "Mensaje", type: "textarea", placeholder: "Una frase o dedicatoria especial" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "fiesta",
+                name: "Fiesta Especial",
+                description: "Para cualquier celebración fuera de catálogo.",
+                icon: "🎉",
+                fields: [
+                    { name: "titulo", label: "Título del evento", type: "text", required: true, placeholder: "Ej: Halloween Gala" },
+                    { name: "anfitrion", label: "Anfitrión", type: "text", required: true },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "lugar", label: "Lugar", type: "text", required: true },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "tema", label: "Tema / Concepto", type: "text" },
+                    { name: "dresscode", label: "Dress code", type: "text", placeholder: "Ej: Black tie" },
+                    { name: "descripcion", label: "Descripción", type: "textarea" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            }
+        ];
+
+        // Inicializar cliente Supabase con credenciales de config.js (si existe)
+        const runtimeConfig = (typeof window !== 'undefined' && window.SUPABASE_CONFIG)
+            ? window.SUPABASE_CONFIG
+            : null;
+        const SUPABASE_URL = runtimeConfig && runtimeConfig.URL ? runtimeConfig.URL : "";
+        const SUPABASE_KEY = runtimeConfig && runtimeConfig.ANON_KEY ? runtimeConfig.ANON_KEY : "";
+        const hasSupabaseConfig = Boolean(SUPABASE_URL && SUPABASE_KEY && typeof supabase !== 'undefined');
+        const supabaseClient = hasSupabaseConfig
+            ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+            : null;
+
+        if (!hasSupabaseConfig) {
+            console.warn("Supabase no está configurado. El estudio funcionará sin guardado de proyectos.");
+        }
+
+        let selectedTemplate = null;
+        let currentData = null;
+        let currentW4h1 = null;
+        let currentPrompt = null;
+        let currentProjectId = null;
+        let currentQrDataUrl = null;
+
+        // Renderizar tarjetas de plantillas
+        function renderTemplates() {
+            const grid = document.getElementById('templates-grid');
+            grid.innerHTML = EVENT_TEMPLATES.map(template => `
+                <div class="template-card" data-id="${template.id}" onclick="selectTemplate('${template.id}')">
+                    <div class="template-icon">${template.icon}</div>
+                    <div>
+                        <h3>${template.name}</h3>
+                        <p>${template.description}</p>
+                    </div>
+                    <div class="template-indicator"></div>
+                </div>
+            `).join('');
+        }
+
+        // Seleccionar plantilla
+        function selectTemplate(id) {
+            selectedTemplate = EVENT_TEMPLATES.find(t => t.id === id);
+            
+            // Actualizar UI
+            document.querySelectorAll('.template-card').forEach(card => {
+                card.classList.toggle('selected', card.dataset.id === id);
+            });
+            
+            // Habilitar botón continuar
+            document.getElementById('continue-btn').disabled = false;
+        }
+
+        // Ir al formulario
+        function goToForm() {
+            if (!selectedTemplate) return;
+
+            const selectSection = document.getElementById('select-section');
+            const formSection = document.getElementById('form-section');
+
+            selectSection.classList.add('hidden');
+            formSection.classList.add('active');
+
+            // Mostrar nombre de la plantilla
+            document.getElementById('form-template-name').textContent = selectedTemplate.name;
+
+            // Generar campos del formulario
+            const form = document.getElementById('invitation-form');
+            let formHTML = '';
+            selectedTemplate.fields.forEach(field => {
+                formHTML += `
+                    <div class="form-group ${field.type === 'textarea' ? 'full-width' : ''}">
+                        <label>
+                            ${field.label}
+                            ${field.required ? '<span class="required">*</span>' : ''}
+                        </label>
+                `;
+                if (field.type === 'textarea') {
+                    formHTML += `<textarea name="${field.name}" ${field.required ? 'required' : ''} placeholder="${field.placeholder || ''}"></textarea>`;
+                } else {
+                    formHTML += `<input type="${field.type}" name="${field.name}" ${field.required ? 'required' : ''} placeholder="${field.placeholder || ''}">`;
+                }
+                formHTML += `</div>`;
+            });
+            formHTML += `
+                <div class="form-actions full-width">
+                    <button type="submit" class="submit-btn">Generar invitación →</button>
+                </div>
+            `;
+            form.innerHTML = formHTML;
+        }
+
+        // Volver a selección
+        function goToSelect() {
+            document.getElementById('form-section').classList.remove('active');
+            document.getElementById('select-section').classList.remove('hidden');
+        }
+
+        // Guardar la invitación en Supabase
+        async function saveToSupabase(template, data, w4h1, promptText, qrDataUrl) {
+            if (!hasSupabaseConfig || !supabaseClient) {
+                return null;
+            }
+            try {
+                // 1. Guardar el proyecto
+                const { data: project, error: projectErr } = await supabaseClient
+                    .from("projects")
+                    .insert({
+                        event_type_slug: template.id,
+                        event_type_name: template.name,
+                        form_data: data,
+                        w4h1: w4h1
+                    })
+                    .select()
+                    .single();
+                if (projectErr) throw projectErr;
+
+                // 2. Guardar el prompt
+                const { error: promptErr } = await supabaseClient
+                    .from("generated_prompts")
+                    .insert({
+                        project_id: project.id,
+                        prompt_text: promptText,
+                        provider: "pending",
+                        model: null
+                    });
+                if (promptErr) throw promptErr;
+
+                // 3. Guardar el JSON W4H1
+                const { error: jsonErr } = await supabaseClient
+                    .from("generated_jsons")
+                    .insert({
+                        project_id: project.id,
+                        w4h1: w4h1
+                    });
+                if (jsonErr) throw jsonErr;
+
+                // 4. Guardar el QR
+                if (qrDataUrl) {
+                    const { error: qrErr } = await supabaseClient
+                        .from("generated_qrs")
+                        .insert({
+                            project_id: project.id,
+                            payload: w4h1,
+                            data_url: qrDataUrl
+                        });
+                    if (qrErr) throw qrErr;
+                }
+
+                console.log("Proyecto guardado exitosamente en Supabase con ID:", project.id);
+                return project.id;
+            } catch (err) {
+                console.error("Error al guardar en Supabase:", err);
+                alert("Error al sincronizar con el backend: " + err.message);
+                return null;
+            }
+        }
+
+        // Enviar formulario
+        async function submitForm(event) {
+            event.preventDefault();
+            
+            const submitBtn = event.target.querySelector('.submit-btn');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Guardando y generando...';
+            }
+
+            const formData = new FormData(event.target);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+            
+            // Guardar datos globalmente
+            currentData = data;
+            
+            // Generar JSON W4H1
+            currentW4h1 = generateW4H1(selectedTemplate, data);
+            
+            // Generar prompt
+            currentPrompt = generatePrompt(selectedTemplate, data);
+            console.log('Prompt generado a partir de datos de formulario:', currentPrompt);
+            
+            // Generar código QR real usando la librería QRCode
+            try {
+                if (typeof QRCode === 'undefined' || !QRCode.toDataURL) {
+                    throw new Error('La librería QRCode no está disponible. Verifica la ruta del CDN.');
+                }
+                const qrText = `INVITAIA:${selectedTemplate.name}\n${JSON.stringify(currentW4h1)}`;
+                currentQrDataUrl = await QRCode.toDataURL(qrText, { margin: 2, width: 256 });
+            } catch (qrErr) {
+                console.error("Error al generar código QR:", qrErr);
+                alert("Error al generar el QR: " + qrErr.message);
+                currentQrDataUrl = null;
+            }
+
+            // Guardar en Supabase backend
+            currentProjectId = await saveToSupabase(selectedTemplate, data, currentW4h1, currentPrompt, currentQrDataUrl);
+
+            // Mostrar sección de resultados
+            document.getElementById('form-section').classList.remove('active');
+            document.getElementById('result-section').classList.add('active');
+            
+            // Renderizar tarjeta de invitación visual
+            renderInvitationCard(selectedTemplate, data, currentQrDataUrl);
+            
+            // Mostrar JSON y prompt
+            document.getElementById('json-output').textContent = JSON.stringify(currentW4h1, null, 2);
+            document.getElementById('prompt-output').textContent = currentPrompt;
+            
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Generar invitación →';
+            }
+
+            console.log('Datos del formulario:', data);
+            console.log('W4H1:', currentW4h1);
+            console.log('Prompt:', currentPrompt);
+        }
+
+        // Generar estructura W4H1
+        function generateW4H1(template, data) {
+            const social = {
+                instagram: data.instagram || "",
+                whatsapp: data.whatsapp || ""
+            };
+
+            const eventData = {
+                ...getWhoData(template, data),
+                ...social,
+                evento: template.name,
+                tema: data.tema || data.tipo || data.descripcion || "",
+                mensaje: data.mensaje || data.notas || "",
+                mesaRegalos: data.mesaRegalos || "",
+                cuentaRegalo: data.cuentaRegalo || "",
+                fecha: data.fecha || "",
+                hora: data.hora || "",
+                lugar: data.lugar || data.ceremonia || data.recepcion || data.lugarRecepcion || "",
+                direccion: data.direccion || "",
+                confirmarAntes: data.fechaLimiteConfirmacion || "",
+                codigoVestimenta: data.codigoVestimenta || data.dresscode || "",
+                colores: data.colores || "",
+                descripcion: data.descripcion || "",
+                form_data: {}
+            };
+
+            Object.keys(data).forEach(key => {
+                if (data[key] !== undefined && data[key] !== null && data[key] !== '') {
+                    eventData.form_data[key] = data[key];
+                }
+            });
+
+            return {
+                who: {
+                    ...getWhoData(template, data),
+                    ...social
+                },
+                what: {
+                    evento: template.name,
+                    tema: data.tema || data.tipo || data.descripcion || "",
+                    mensaje: data.mensaje || data.notas || "",
+                    mesaRegalos: data.mesaRegalos || "",
+                    cuentaRegalo: data.cuentaRegalo || ""
+                },
+                when: {
+                    fecha: data.fecha || "",
+                    hora: data.hora || "",
+                    confirmarAntes: data.fechaLimiteConfirmacion || ""
+                },
+                where: {
+                    lugar: data.lugar || "",
+                    direccion: data.direccion || "",
+                    ceremonia: data.ceremonia || "",
+                    recepcion: data.recepcion || "",
+                    lugarRecepcion: data.lugarRecepcion || ""
+                },
+                why: {
+                    motivo: data.mensaje || `Invitación para ${template.name}`
+                },
+                how: {
+                    estilo: data.tema ? `Estilo ${data.tema}` : "Elegante",
+                    codigoVestimenta: data.codigoVestimenta || data.dresscode || "",
+                    colores: data.colores || "",
+                    descripcion: data.descripcion || ""
+                },
+                form_data: eventData.form_data
+            };
+        }
+
+        // Obtener datos específicos de "quién" según la plantilla
+        function getWhoData(template, data) {
+            switch(template.id) {
+                case 'cumpleanos':
+                    return {
+                        celebrante: data.nombre || "",
+                        edad: data.edad || ""
+                    };
+                case 'matrimonio':
+                    return {
+                        novia: data.novia || "",
+                        novio: data.novio || ""
+                    };
+                case 'quince':
+                    return {
+                        quinceanera: data.nombre || ""
+                    };
+                case 'graduacion':
+                    return {
+                        graduado: data.nombre || "",
+                        titulo: data.titulo || "",
+                        institucion: data.institucion || ""
+                    };
+                case 'comunion':
+                    return {
+                        comulgante: data.nombre || "",
+                        parroquia: data.parroquia || ""
+                    };
+                case 'babyshower':
+                    return {
+                        mama: data.mama || "",
+                        papa: data.papa || "",
+                        bebe: data.bebe || "",
+                        genero: data.genero || ""
+                    };
+                case 'aniversario':
+                    return {
+                        protagonistas: data.personas || "",
+                        anios: data.anios || ""
+                    };
+                case 'fiesta':
+                    return {
+                        anfitrion: data.anfitrion || "",
+                        titulo: data.titulo || ""
+                    };
+                default:
+                    return {};
+            }
+        }
+
+        // Generar prompt para IA
+        function generatePrompt(template, data) {
+                      // Extraer formData del objeto data (maneja ambos casos: directo y con form_data anidado)
+            const formData = data && data.form_data ? data.form_data : data || {};
+            const subject = getPromptSubject(template, formData);
+            const details = template.fields
+                .filter(field => formData[field.name] !== undefined && formData[field.name] !== null && formData[field.name] !== '')
+                .map(field => `${field.label}: ${formData[field.name]}`)
+                .join(', ');
+            const venue = formData.lugar || formData.ceremonia || formData.recepcion || formData.lugarRecepcion || "—";
+            const dateTime = [formData.fecha, formData.hora].filter(Boolean).join(' at ');
+
+            const prompt = `${subject}${details ? ` Details: ${details}.` : ''} Date: ${dateTime || 'TBD'}, venue: ${venue}. Style: modern minimal luxury, photorealistic, high detail, 4k, editorial typography, Apple-like minimal luxury, gold accents on white and black.`;
+
+            console.log('generatePrompt input:', template.id, formData);
+            console.log('Generated prompt:', prompt);
+            return prompt;
+        }
+
+        // Obtener sujeto del prompt según la plantilla
+        function getPromptSubject(template, data) {
+            switch(template.id) {
+                case 'cumpleanos':
+                    return `Elegant premium birthday invitation card for ${data.nombre || 'the guest'} turning ${data.edad || 'any age'}. Theme: ${data.tema || "modern minimal"}.`;
+                case 'matrimonio':
+                    return `Luxury wedding invitation for ${data.novia || 'the couple'} & ${data.novio || ''}. Ceremony at ${data.ceremonia || 'the ceremony venue'}, reception at ${data.recepcion || 'the reception venue'}.`;
+                case 'quince':
+                    return `Sophisticated quinceañera invitation for ${data.nombre || 'the celebrant'}. Theme: ${data.tema || "royal glamour"}.`;
+                case 'graduacion':
+                    return `Premium graduation invitation for ${data.nombre || 'the graduate'}, graduating in ${data.titulo || 'their degree'} at ${data.institucion || 'their institution'}.`;
+                case 'comunion':
+                    return `Refined first communion invitation for ${data.nombre || 'the child'} at ${data.parroquia || 'the parish'}.`;
+                case 'babyshower':
+                    return `Tender baby shower invitation for ${data.mama || 'the mom'}${data.bebe ? `, welcoming ${data.bebe}` : ""}.`;
+                case 'aniversario':
+                    return `Sophisticated anniversary invitation celebrating ${data.anios || 'multiple'} years of ${data.personas || 'the couple'}.`;
+                case 'fiesta':
+                    return `Striking invitation for "${data.titulo || 'a special event'}" hosted by ${data.anfitrion || 'the host'}${data.tema ? `, theme ${data.tema}` : ""}${data.dresscode ? `, dress code ${data.dresscode}` : ""}.`;
+                default:
+                    return `Elegant invitation for ${template.name}`;
+            }
+        }
+
+        // Navegar a la vista principal (Studio)
+        function goToStudio(event) {
+            if (event) event.preventDefault();
+            
+            // Ocultar sección de proyectos
+            document.getElementById('projects-section').classList.remove('active');
+            
+            // Mostrar selector principal
+            const selectSection = document.getElementById('select-section');
+            const formSection = document.getElementById('form-section');
+            const resultSection = document.getElementById('result-section');
+            
+            selectSection.classList.remove('hidden');
+            formSection.classList.remove('active');
+            resultSection.classList.remove('active');
+            
+            // Actualizar menú activo
+            document.getElementById('nav-studio').classList.add('active');
+            document.getElementById('nav-projects').classList.remove('active');
+        }
+
+        // Mostrar sección de proyectos
+        async function showProjects(event) {
+            if (event) event.preventDefault();
+
+            if (!hasSupabaseConfig || !supabaseClient) {
+                alert("La vista de proyectos requiere config.js con credenciales de Supabase.");
+                return;
+            }
+            
+            // Actualizar menú activo
+            document.getElementById('nav-studio').classList.remove('active');
+            document.getElementById('nav-projects').classList.add('active');
+            
+            // Ocultar otras secciones
+            document.getElementById('select-section').classList.add('hidden');
+            document.getElementById('form-section').classList.remove('active');
+            document.getElementById('result-section').classList.remove('active');
+            
+            // Mostrar sección de proyectos
+            document.getElementById('projects-section').classList.add('active');
+            
+            // Cargar proyectos de Supabase
+            await loadProjectsFromSupabase();
+        }
+
+        // Consultar y renderizar proyectos desde Supabase
+        async function loadProjectsFromSupabase() {
+            const loadingDiv = document.getElementById('projects-loading');
+            const emptyDiv = document.getElementById('projects-empty');
+            const gridDiv = document.getElementById('projects-grid');
+
+            loadingDiv.classList.remove('hidden');
+            emptyDiv.classList.add('hidden');
+            gridDiv.innerHTML = '';
+
+            try {
+                const { data: projects, error } = await supabaseClient
+                    .from("projects")
+                    .select("*, generated_images(url)")
+                    .order("created_at", { ascending: false });
+
+                if (error) throw error;
+                
+                loadingDiv.classList.add('hidden');
+                
+                if (!projects || projects.length === 0) {
+                    emptyDiv.classList.remove('hidden');
+                    return;
+                }
+                
+                let gridHTML = '';
+                projects.forEach(p => {
+                    const template = EVENT_TEMPLATES.find(t => t.id === p.event_type_slug);
+                    const icon = template ? template.icon : '✨';
+                    
+                    let title = p.event_type_name;
+                    if (p.form_data) {
+                        title = p.form_data.nombre || 
+                                p.form_data.novia || 
+                                p.form_data.graduado || 
+                                p.form_data.titulo || 
+                                p.form_data.personas || 
+                                p.form_data.mama || 
+                                p.event_type_name;
+                    }
+                    
+                    const coverUrl = p.generated_images && p.generated_images.length > 0
+                        ? p.generated_images[0].url
+                        : null;
+
+                    // Gradientes elegantes según tipo de evento
+                    const getGradient = (eventSlug) => {
+                        const gradients = {
+                            cumpleanos: 'linear-gradient(135deg, #FF6B6B 0%, #FFE66D 100%)',
+                            matrimonio: 'linear-gradient(135deg, #D4AF37 0%, #F7E7CE 100%)',
+                            quince: 'linear-gradient(135deg, #E91E63 0%, #9C27B0 100%)',
+                            graduacion: 'linear-gradient(135deg, #2196F3 0%, #00BCD4 100%)',
+                            comunion: 'linear-gradient(135deg, #8BC34A 0%, #CDDC39 100%)',
+                            babyshower: 'linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%)',
+                            aniversario: 'linear-gradient(135deg, #D4AF37 0%, #B8860B 100%)',
+                            fiesta: 'linear-gradient(135deg, #FF5722 0%, #FF9800 100%)'
+                        };
+                        return gradients[eventSlug] || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                    };
+
+                    const coverHTML = coverUrl
+                        ? `<img src="${coverUrl}" alt="${title}" style="width:100%; height:10rem; object-fit:cover; border-radius:0.75rem 0.75rem 0 0;" />`
+                        : `<div style="height:10rem; width:100%; background:${getGradient(p.event_type_slug)}; display:flex; align-items:center; justify-content:center; font-size:3rem; border-radius:0.75rem 0.75rem 0 0; position:relative; overflow:hidden;">
+                                <div style="position:absolute; inset:0; background:rgba(255,255,255,0.1); backdrop-filter:blur(2px);"></div>
+                                <span style="position:relative; z-index:1; filter:drop-shadow(0 4px 6px rgba(0,0,0,0.1));">${icon}</span>
+                           </div>`;
+                        
+                    const dateStr = new Date(p.created_at).toLocaleString();
+                    
+                    gridHTML += `
+                        <div class="template-card" style="padding:0; overflow:hidden; gap:0; cursor:default;" data-id="${p.id}">
+                            ${coverHTML}
+                            <div style="padding:1.5rem; display:flex; flex-direction:column; gap:0.5rem; width:100%;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-size:1.5rem;">${icon}</span>
+                                    <span style="font-size:0.65rem; text-transform:uppercase; letter-spacing:0.1em; color:var(--gold); font-weight:600;">${p.event_type_name}</span>
+                                </div>
+                                <h3 style="font-size:1.15rem; font-weight:600; margin-top:0.25rem;">${title}</h3>
+                                <span style="font-size:0.7rem; color:var(--muted-foreground);">${dateStr}</span>
+                                
+                                <div style="display:flex; gap:0.5rem; margin-top:1rem; width:100%;">
+                                    <button class="action-btn primary" style="flex:1; padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="viewProject('${p.id}')">Ver</button>
+                                    <button class="action-btn" style="padding:0.4rem 0.8rem; font-size:0.8rem;" onclick="duplicateProjectInDB('${p.id}')">Duplicar</button>
+                                    <button class="action-btn" style="padding:0.4rem 0.8rem; font-size:0.8rem; color:var(--destructive);" onclick="deleteProjectFromDB('${p.id}')">Eliminar</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                gridDiv.innerHTML = gridHTML;
+            } catch (err) {
+                console.error("Error al cargar proyectos de Supabase:", err);
+                loadingDiv.classList.add('hidden');
+                gridDiv.innerHTML = `<div style="color:var(--destructive); text-align:center; padding:2rem;">No se pudieron cargar los proyectos: ${err.message}</div>`;
+            }
+        }
+
+        // Cargar un proyecto seleccionado en la pantalla de resultados
+        async function viewProject(id) {
+            try {
+                const { data: project, error } = await supabaseClient
+                    .from("projects")
+                    .select("*, generated_qrs(data_url)")
+                    .eq("id", id)
+                    .single();
+                    
+                if (error) throw error;
+                
+                selectedTemplate = EVENT_TEMPLATES.find(t => t.id === project.event_type_slug);
+                if (!selectedTemplate) throw new Error("Plantilla no encontrada");
+                
+                currentData = project.form_data;
+                currentW4h1 = project.w4h1;
+                currentPrompt = generatePrompt(selectedTemplate, currentData);
+                currentProjectId = project.id;
+                
+                if (project.generated_qrs && project.generated_qrs.length > 0) {
+                    currentQrDataUrl = project.generated_qrs[0].data_url;
+                } else {
+                    const qrText = `INVITAIA:${selectedTemplate.name}\n${JSON.stringify(currentW4h1)}`;
+                    currentQrDataUrl = await QRCode.toDataURL(qrText, { margin: 2, width: 256 });
+                }
+                
+                document.getElementById('projects-section').classList.remove('active');
+                document.getElementById('result-section').classList.add('active');
+                
+                renderInvitationCard(selectedTemplate, currentData, currentQrDataUrl);
+                
+                document.getElementById('json-output').textContent = JSON.stringify(currentW4h1, null, 2);
+                document.getElementById('prompt-output').textContent = currentPrompt;
+                
+                console.log("Proyecto cargado en la UI:", currentProjectId);
+            } catch (err) {
+                console.error("Error al ver el proyecto:", err);
+                alert("Error al cargar el proyecto: " + err.message);
+            }
+        }
+
+        // Duplicar un proyecto en Supabase
+        async function duplicateProjectInDB(id) {
+            try {
+                const { data: original, error: fetchErr } = await supabaseClient
+                    .from("projects")
+                    .select("*")
+                    .eq("id", id)
+                    .single();
+                if (fetchErr) throw fetchErr;
+                
+                const { data: duplicate, error: insertErr } = await supabaseClient
+                    .from("projects")
+                    .insert({
+                        event_type_slug: original.event_type_slug,
+                        event_type_name: original.event_type_name,
+                        form_data: original.form_data,
+                        w4h1: original.w4h1
+                    })
+                    .select()
+                    .single();
+                if (insertErr) throw insertErr;
+                
+                const { data: qrs } = await supabaseClient
+                    .from("generated_qrs")
+                    .select("*")
+                    .eq("project_id", id);
+                    
+                if (qrs && qrs.length > 0) {
+                    await supabaseClient
+                        .from("generated_qrs")
+                        .insert({
+                            project_id: duplicate.id,
+                            payload: qrs[0].payload,
+                            data_url: qrs[0].data_url
+                        });
+                }
+
+                alert("Proyecto duplicado con éxito");
+                await loadProjectsFromSupabase();
+            } catch (err) {
+                console.error("Error al duplicar el proyecto:", err);
+                alert("Error al duplicar: " + err.message);
+            }
+        }
+
+        // Eliminar un proyecto de Supabase
+        async function deleteProjectFromDB(id) {
+            if (!confirm("¿Estás seguro de que deseas eliminar este proyecto de forma permanente del backend?")) return;
+            try {
+                const { error } = await supabaseClient
+                    .from("projects")
+                    .delete()
+                    .eq("id", id);
+                if (error) throw error;
+                
+                alert("Proyecto eliminado con éxito");
+                await loadProjectsFromSupabase();
+            } catch (err) {
+                console.error("Error al eliminar el proyecto:", err);
+                alert("Error al eliminar: " + err.message);
+            }
+        }
+
+        // Renderizar tarjeta de invitación visual
+        function renderInvitationCard(template, data, qrDataUrl) {
+            const card = document.getElementById('invitation-card');
+            
+            // Obtener título principal según la plantilla
+            const getTitle = () => {
+                switch(template.id) {
+                    case 'cumpleanos':
+                        return data.nombre;
+                    case 'matrimonio':
+                        return `${data.novia} <span class="gold">&</span> ${data.novio}`;
+                    case 'quince':
+                        return data.nombre;
+                    case 'graduacion':
+                        return data.nombre;
+                    case 'comunion':
+                        return data.nombre;
+                    case 'babyshower':
+                        return data.mama;
+                    case 'aniversario':
+                        return data.personas;
+                    case 'fiesta':
+                        return data.titulo;
+                    default:
+                        return 'Tu evento';
+                }
+            };
+
+            // Generar detalles adicionales según la plantilla
+            const getAdditionalDetails = () => {
+                const details = [];
+                switch(template.id) {
+                    case 'cumpleanos':
+                        if (data.tema) details.push(`<p>Tema: ${data.tema}</p>`);
+                        break;
+                    case 'matrimonio':
+                        if (data.ceremonia) details.push(`<p>Ceremonia: ${data.ceremonia}</p>`);
+                        if (data.recepcion) details.push(`<p>Recepción: ${data.recepcion}</p>`);
+                        break;
+                    case 'quince':
+                        if (data.tema) details.push(`<p>Tema: ${data.tema}</p>`);
+                        break;
+                    case 'graduacion':
+                        if (data.titulo) details.push(`<p>${data.titulo}</p>`);
+                        if (data.institucion) details.push(`<p>${data.institucion}</p>`);
+                        break;
+                    case 'comunion':
+                        if (data.parroquia) details.push(`<p>${data.parroquia}</p>`);
+                        break;
+                    case 'babyshower':
+                        if (data.bebe) details.push(`<p>Bienvenido ${data.bebe}</p>`);
+                        if (data.genero) details.push(`<p>${data.genero}</p>`);
+                        if (data.tema) details.push(`<p>Tema: ${data.tema}</p>`);
+                        break;
+                    case 'aniversario':
+                        if (data.anios) details.push(`<p>${data.anios} años</p>`);
+                        if (data.tipo) details.push(`<p>${data.tipo}</p>`);
+                        break;
+                    case 'fiesta':
+                        if (data.tema) details.push(`<p>Tema: ${data.tema}</p>`);
+                        if (data.dresscode) details.push(`<p>Dress code: ${data.dresscode}</p>`);
+                        if (data.descripcion) details.push(`<p class="italic">${data.descripcion}</p>`);
+                        break;
+                }
+                return details.join('');
+            };
+
+            const qrHtml = qrDataUrl 
+                ? `<img src="${qrDataUrl}" alt="Código QR del evento" style="width: 8rem; height: 8rem; border-radius: 0.5rem; border: 1px solid var(--border); background: white; padding: 0.5rem;" />`
+                : `<div style="width: 8rem; height: 8rem; border-radius: 0.5rem; border: 1px solid var(--border); background: white; padding: 0.5rem; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--muted-foreground);">QR Code</div>`;
+
+            card.innerHTML = `
+                <div class="event-type">${template.name}</div>
+                <div class="divider"></div>
+                <h2>${getTitle()}</h2>
+                <div class="details">
+                    ${data.fecha && data.hora ? `<p class="main-detail">${data.fecha} · ${data.hora}</p>` : ''}
+                    ${data.lugar ? `<p>${data.lugar}</p>` : ''}
+                    ${getAdditionalDetails()}
+                </div>
+                <div class="qr-placeholder">
+                    ${qrHtml}
+                    <span>Escanea para confirmar</span>
+                </div>
+            `;
+        }
+
+        // Copiar al portapapeles
+        function copyToClipboard(type) {
+            const text = type === 'json' ? JSON.stringify(currentW4h1, null, 2) : currentPrompt;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert(`${type === 'json' ? 'JSON' : 'Prompt'} copiado al portapapeles`);
+                }).catch(() => {
+                    fallbackCopyToClipboard(text, type);
+                });
+            } else {
+                fallbackCopyToClipboard(text, type);
+            }
+        }
+
+        function fallbackCopyToClipboard(text, type) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert(`${type === 'json' ? 'JSON' : 'Prompt'} copiado al portapapeles`);
+        }
+
+        // Descargar PDF Real usando jsPDF y html2canvas
+        function downloadPDF(event) {
+            const cardElement = document.getElementById('invitation-card');
+            if (!cardElement) return;
+
+            const btn = event ? event.target : null;
+            let originalText = '';
+            if (btn) {
+                originalText = btn.textContent;
+                btn.textContent = 'Generando PDF...';
+                btn.disabled = true;
+            }
+
+            const { jsPDF } = window.jspdf;
+
+            html2canvas(cardElement, {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                
+                const pdf = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'px',
+                    format: [canvas.width / 2, canvas.height / 2]
+                });
+
+                pdf.addImage(imgData, 'PNG', 0, 0, canvas.width / 2, canvas.height / 2);
+                pdf.save(`invitacion-${currentProjectId || 'evento'}.pdf`);
+
+                if (btn) {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            }).catch(err => {
+                console.error("Error al generar PDF:", err);
+                alert("Error al generar PDF: " + err.message);
+                if (btn) {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }
+            });
+        }
+
+        // Descargar QR Real
+        function downloadQR(event) {
+            if (!currentQrDataUrl) {
+                alert('No hay un código QR generado para descargar.');
+                return;
+            }
+            const link = document.createElement('a');
+            link.href = currentQrDataUrl;
+            link.download = `invitacion-qr-${currentProjectId || 'evento'}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Volver al formulario desde resultados
+        function editForm() {
+            document.getElementById('result-section').classList.remove('active');
+            document.getElementById('form-section').classList.add('active');
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', () => {
+            renderTemplates();
+
+            // Event listener para botón continuar
+            document.getElementById('continue-btn').addEventListener('click', goToForm);
+        });
+    </script>
+</body>
+</html>
