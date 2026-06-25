@@ -747,7 +747,7 @@
                 id: "cumpleanos",
                 name: "Cumpleanos",
                 description: "Celebra un ano mas con una invitacion memorable.",
-                icon: "*",
+                icon: "&#127874;",
                 fields: [
                     { name: "nombre", label: "Nombre", type: "text", required: true },
                     { name: "edad", label: "Edad", type: "number", required: true },
@@ -769,7 +769,7 @@
                 id: "matrimonio",
                 name: "Matrimonio",
                 description: "Una invitacion elegante para el dia mas especial.",
-                icon: "*",
+                icon: "&#128141;",
                 fields: [
                     { name: "novia", label: "Nombre Novia", type: "text", required: true },
                     { name: "novio", label: "Nombre Novio", type: "text", required: true },
@@ -791,7 +791,7 @@
                 id: "quince",
                 name: "Quince Anos",
                 description: "Diseno sofisticado para una noche inolvidable.",
-                icon: "*",
+                icon: "&#127801;",
                 fields: [
                     { name: "nombre", label: "Nombre", type: "text", required: true },
                     { name: "fecha", label: "Fecha", type: "date", required: true },
@@ -811,7 +811,7 @@
                 id: "graduacion",
                 name: "Graduacion",
                 description: "Honra un logro academico con estilo.",
-                icon: "*",
+                icon: "&#127891;",
                 fields: [
                     { name: "nombre", label: "Nombre del graduado", type: "text", required: true },
                     { name: "titulo", label: "Titulo / Grado", type: "text", required: true, placeholder: "Ej: Ingenieria" },
@@ -831,7 +831,7 @@
                 id: "comunion",
                 name: "Primera Comunion",
                 description: "Una invitacion serena para un da sagrado.",
-                icon: "*",
+                icon: "&#128330;",
                 fields: [
                     { name: "nombre", label: "Nombre del nino/a", type: "text", required: true },
                     { name: "parroquia", label: "Parroquia / Iglesia", type: "text", required: true },
@@ -849,7 +849,7 @@
                 id: "babyshower",
                 name: "Baby Shower",
                 description: "Da la bienvenida con dulzura y elegancia.",
-                icon: "*",
+                icon: "&#128118;",
                 fields: [
                     { name: "mama", label: "Nombre de la mama", type: "text", required: true },
                     { name: "papa", label: "Nombre del papa", type: "text", placeholder: "Opcional" },
@@ -870,7 +870,7 @@
                 id: "aniversario",
                 name: "Aniversario",
                 description: "Conmemora anos de amor o historia.",
-                icon: "*",
+                icon: "&#10084;&#65039;",
                 fields: [
                     { name: "personas", label: "Personas / Pareja", type: "text", required: true, placeholder: "Ej: Ana & Luis" },
                     { name: "anios", label: "Anos a celebrar", type: "number", required: true },
@@ -889,7 +889,7 @@
                 id: "fiesta",
                 name: "Fiesta Especial",
                 description: "Para cualquier celebracion fuera de catalogo.",
-                icon: "*",
+                icon: "&#127881;",
                 fields: [
                     { name: "titulo", label: "Titulo del evento", type: "text", required: true, placeholder: "Ej: Halloween Gala" },
                     { name: "anfitrion", label: "Anfitrion", type: "text", required: true },
@@ -900,6 +900,86 @@
                     { name: "tema", label: "Tema / Concepto", type: "text" },
                     { name: "dresscode", label: "Dress code", type: "text", placeholder: "Ej: Black tie" },
                     { name: "descripcion", label: "Descripcion", type: "textarea" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "bautizo",
+                name: "Bautizo",
+                description: "Una invitacion dulce para un momento espiritual en familia.",
+                icon: "&#128167;",
+                fields: [
+                    { name: "nombreBebe", label: "Nombre del bebe", type: "text", required: true },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "parroquia", label: "Iglesia / Parroquia", type: "text", required: true },
+                    { name: "lugarRecepcion", label: "Lugar de recepcion", type: "text", placeholder: "Salon o casa" },
+                    { name: "padres", label: "Padres", type: "text", placeholder: "Ej: Camila y Juan" },
+                    { name: "padrinos", label: "Padrinos", type: "text", placeholder: "Nombres de padrinos" },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "codigoVestimenta", label: "Codigo de vestimenta", type: "text", placeholder: "Ej: Blanco y pastel" },
+                    { name: "mensaje", label: "Mensaje", type: "textarea", placeholder: "Frase especial para el bautizo" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "despedida",
+                name: "Despedida de Soltero/a",
+                description: "Un diseno vibrante para celebrar antes del gran dia.",
+                icon: "&#129346;",
+                fields: [
+                    { name: "homenajeado", label: "Nombre del homenajeado", type: "text", required: true },
+                    { name: "tipo", label: "Tipo", type: "text", placeholder: "Soltero / Soltera" },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "lugar", label: "Lugar", type: "text", required: true },
+                    { name: "anfitrion", label: "Anfitrion", type: "text", placeholder: "Quien organiza" },
+                    { name: "dresscode", label: "Dress code", type: "text", placeholder: "Ej: All black" },
+                    { name: "tema", label: "Tema", type: "text", placeholder: "Ej: Tropical Night" },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "notas", label: "Notas", type: "textarea", placeholder: "Indicaciones importantes" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "corporativo",
+                name: "Evento Corporativo",
+                description: "Invitaciones profesionales para lanzamientos, networking y cumbres.",
+                icon: "&#127970;",
+                fields: [
+                    { name: "empresa", label: "Empresa", type: "text", required: true },
+                    { name: "titulo", label: "Titulo del evento", type: "text", required: true },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "lugar", label: "Lugar", type: "text", required: true },
+                    { name: "direccion", label: "Direccion", type: "text", placeholder: "Direccion o enlace" },
+                    { name: "ponente", label: "Ponente principal", type: "text", placeholder: "Nombre y cargo" },
+                    { name: "tipo", label: "Tipo de evento", type: "text", placeholder: "Seminario, lanzamiento, networking" },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "descripcion", label: "Descripcion", type: "textarea", placeholder: "Agenda breve o objetivo" },
+                    { name: "instagram", label: "Instagram", type: "text", placeholder: "@empresa" },
+                    { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
+                ]
+            },
+            {
+                id: "navidad",
+                name: "Cena de Navidad",
+                description: "Invitacion calida para compartir en familia, amigos o empresa.",
+                icon: "&#127876;",
+                fields: [
+                    { name: "anfitrion", label: "Anfitrion", type: "text", required: true },
+                    { name: "fecha", label: "Fecha", type: "date", required: true },
+                    { name: "hora", label: "Hora", type: "time", required: true },
+                    { name: "lugar", label: "Lugar", type: "text", required: true },
+                    { name: "direccion", label: "Direccion", type: "text", placeholder: "Direccion completa" },
+                    { name: "tipo", label: "Tipo", type: "text", placeholder: "Familiar, empresarial, amigos" },
+                    { name: "menu", label: "Menu destacado", type: "text", placeholder: "Ej: pavo, tamales, postres" },
+                    { name: "codigoVestimenta", label: "Codigo de vestimenta", type: "text", placeholder: "Ej: Rojo y verde" },
+                    { name: "fechaLimiteConfirmacion", label: "Confirmar antes de", type: "date" },
+                    { name: "mensaje", label: "Mensaje", type: "textarea", placeholder: "Deseo navideno especial" },
                     { name: "instagram", label: "Instagram", type: "text", placeholder: "@usuario" },
                     { name: "whatsapp", label: "WhatsApp", type: "text", placeholder: "+57 300 000 0000" }
                 ]
@@ -1271,6 +1351,29 @@
                         anfitrion: data.anfitrion || "",
                         titulo: data.titulo || ""
                     };
+                case 'bautizo':
+                    return {
+                        bebe: data.nombreBebe || "",
+                        padres: data.padres || "",
+                        padrinos: data.padrinos || ""
+                    };
+                case 'despedida':
+                    return {
+                        homenajeado: data.homenajeado || "",
+                        anfitrion: data.anfitrion || "",
+                        tipo: data.tipo || ""
+                    };
+                case 'corporativo':
+                    return {
+                        empresa: data.empresa || "",
+                        evento: data.titulo || "",
+                        ponente: data.ponente || ""
+                    };
+                case 'navidad':
+                    return {
+                        anfitrion: data.anfitrion || "",
+                        tipo: data.tipo || ""
+                    };
                 default:
                     return {};
             }
@@ -1314,6 +1417,14 @@
                     return `Sophisticated anniversary invitation celebrating ${data.anios || 'multiple'} years of ${data.personas || 'the couple'}.`;
                 case 'fiesta':
                     return `Striking invitation for "${data.titulo || 'a special event'}" hosted by ${data.anfitrion || 'the host'}${data.tema ? `, theme ${data.tema}` : ""}${data.dresscode ? `, dress code ${data.dresscode}` : ""}.`;
+                case 'bautizo':
+                    return `Elegant baptism invitation for ${data.nombreBebe || 'the baby'} at ${data.parroquia || 'the parish'}, hosted by ${data.padres || 'the family'}.`;
+                case 'despedida':
+                    return `Modern bachelorette or bachelor invitation for ${data.homenajeado || 'the honored guest'}${data.tema ? ` with theme ${data.tema}` : ""}.`;
+                case 'corporativo':
+                    return `Premium corporate invitation for ${data.empresa || 'the company'}: ${data.titulo || 'business event'}${data.ponente ? `, keynote by ${data.ponente}` : ""}.`;
+                case 'navidad':
+                    return `Warm Christmas dinner invitation hosted by ${data.anfitrion || 'the host'}${data.tipo ? `, type ${data.tipo}` : ""}.`;
                 default:
                     return `Elegant invitation for ${template.name}`;
             }
@@ -1398,6 +1509,9 @@
                     let title = p.event_type_name;
                     if (p.form_data) {
                         title = p.form_data.nombre || 
+                                p.form_data.nombreBebe ||
+                                p.form_data.homenajeado ||
+                                p.form_data.empresa ||
                                 p.form_data.novia || 
                                 p.form_data.graduado || 
                                 p.form_data.titulo || 
@@ -1420,7 +1534,11 @@
                             comunion: 'linear-gradient(135deg, #8BC34A 0%, #CDDC39 100%)',
                             babyshower: 'linear-gradient(135deg, #FFB6C1 0%, #87CEEB 100%)',
                             aniversario: 'linear-gradient(135deg, #D4AF37 0%, #B8860B 100%)',
-                            fiesta: 'linear-gradient(135deg, #FF5722 0%, #FF9800 100%)'
+                            fiesta: 'linear-gradient(135deg, #FF5722 0%, #FF9800 100%)',
+                            bautizo: 'linear-gradient(135deg, #A7D8F0 0%, #D7F3FF 100%)',
+                            despedida: 'linear-gradient(135deg, #FF5FA2 0%, #7B61FF 100%)',
+                            corporativo: 'linear-gradient(135deg, #1F2937 0%, #0EA5E9 100%)',
+                            navidad: 'linear-gradient(135deg, #0F9D58 0%, #D93025 100%)'
                         };
                         return gradients[eventSlug] || 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
                     };
@@ -1615,6 +1733,14 @@
                         return data.personas;
                     case 'fiesta':
                         return data.titulo;
+                    case 'bautizo':
+                        return data.nombreBebe;
+                    case 'despedida':
+                        return data.homenajeado;
+                    case 'corporativo':
+                        return data.empresa;
+                    case 'navidad':
+                        return data.anfitrion;
                     default:
                         return 'Tu evento';
                 }
@@ -1654,6 +1780,23 @@
                         if (data.tema) details.push(`<p>Tema: ${data.tema}</p>`);
                         if (data.dresscode) details.push(`<p>Dress code: ${data.dresscode}</p>`);
                         if (data.descripcion) details.push(`<p class="italic">${data.descripcion}</p>`);
+                        break;
+                    case 'bautizo':
+                        if (data.parroquia) details.push(`<p>Parroquia: ${data.parroquia}</p>`);
+                        if (data.padrinos) details.push(`<p>Padrinos: ${data.padrinos}</p>`);
+                        break;
+                    case 'despedida':
+                        if (data.tipo) details.push(`<p>${data.tipo}</p>`);
+                        if (data.tema) details.push(`<p>Tema: ${data.tema}</p>`);
+                        if (data.dresscode) details.push(`<p>Dress code: ${data.dresscode}</p>`);
+                        break;
+                    case 'corporativo':
+                        if (data.titulo) details.push(`<p>${data.titulo}</p>`);
+                        if (data.ponente) details.push(`<p>Ponente: ${data.ponente}</p>`);
+                        break;
+                    case 'navidad':
+                        if (data.tipo) details.push(`<p>${data.tipo}</p>`);
+                        if (data.menu) details.push(`<p>Menu: ${data.menu}</p>`);
                         break;
                 }
                 return details.join('');
