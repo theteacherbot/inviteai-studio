@@ -927,6 +927,39 @@
         let currentPrompt = null;
         let currentProjectId = null;
         let currentQrDataUrl = null;
+        const LOCAL_PROJECTS_KEY = "invitaia_local_projects";
+
+        function getLocalProjects() {
+            try {
+                const raw = localStorage.getItem(LOCAL_PROJECTS_KEY);
+                const parsed = raw ? JSON.parse(raw) : [];
+                return Array.isArray(parsed) ? parsed : [];
+            } catch (error) {
+                console.error("Error leyendo proyectos locales:", error);
+                return [];
+            }
+        }
+
+        function setLocalProjects(projects) {
+            localStorage.setItem(LOCAL_PROJECTS_KEY, JSON.stringify(projects));
+        }
+
+        function createLocalProject(template, data, w4h1, qrDataUrl) {
+            const localId = `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+            const projects = getLocalProjects();
+            projects.unshift({
+                id: localId,
+                event_type_slug: template.id,
+                event_type_name: template.name,
+                form_data: data,
+                w4h1,
+                qr_data_url: qrDataUrl || null,
+                created_at: new Date().toISOString(),
+                generated_images: []
+            });
+            setLocalProjects(projects);
+            return localId;
+        }
 
         // Renderizar tarjetas de plantillas
         function renderTemplates() {
@@ -1004,7 +1037,7 @@
         // Guardar la invitacion en Supabase
         async function saveToSupabase(template, data, w4h1, promptText, qrDataUrl) {
             if (!hasSupabaseConfig || !supabaseClient) {
-                return null;
+                return createLocalProject(template, data, w4h1, qrDataUrl);
             }
             try {
                 // 1. Guardar el proyecto
@@ -1311,11 +1344,6 @@
         async function showProjects(event) {
             if (event) event.preventDefault();
 
-            if (!hasSupabaseConfig || !supabaseClient) {
-                alert("La vista de proyectos requiere config.js con credenciales de Supabase.");
-                return;
-            }
-            
             // Actualizar menu activo
             document.getElementById('nav-studio').classList.remove('active');
             document.getElementById('nav-projects').classList.add('active');
@@ -1328,7 +1356,7 @@
             // Mostrar seccion de proyectos
             document.getElementById('projects-section').classList.add('active');
             
-            // Cargar proyectos de Supabase
+            // Cargar proyectos desde backend o local
             await loadProjectsFromSupabase();
         }
 
@@ -1343,12 +1371,17 @@
             gridDiv.innerHTML = '';
 
             try {
-                const { data: projects, error } = await supabaseClient
-                    .from("projects")
-                    .select("*, generated_images(url)")
-                    .order("created_at", { ascending: false });
-
-                if (error) throw error;
+                let projects = [];
+                if (!hasSupabaseConfig || !supabaseClient) {
+                    projects = getLocalProjects();
+                } else {
+                    const { data, error } = await supabaseClient
+                        .from("projects")
+                        .select("*, generated_images(url)")
+                        .order("created_at", { ascending: false });
+                    if (error) throw error;
+                    projects = data || [];
+                }
                 
                 loadingDiv.classList.add('hidden');
                 
@@ -1432,13 +1465,19 @@
         // Cargar un proyecto seleccionado en la pantalla de resultados
         async function viewProject(id) {
             try {
-                const { data: project, error } = await supabaseClient
-                    .from("projects")
-                    .select("*, generated_qrs(data_url)")
-                    .eq("id", id)
-                    .single();
-                    
-                if (error) throw error;
+                let project;
+                if (!hasSupabaseConfig || !supabaseClient) {
+                    project = getLocalProjects().find((p) => p.id === id);
+                    if (!project) throw new Error("Proyecto local no encontrado");
+                } else {
+                    const { data, error } = await supabaseClient
+                        .from("projects")
+                        .select("*, generated_qrs(data_url)")
+                        .eq("id", id)
+                        .single();
+                    if (error) throw error;
+                    project = data;
+                }
                 
                 selectedTemplate = EVENT_TEMPLATES.find(t => t.id === project.event_type_slug);
                 if (!selectedTemplate) throw new Error("Plantilla no encontrada");
@@ -1450,6 +1489,8 @@
                 
                 if (project.generated_qrs && project.generated_qrs.length > 0) {
                     currentQrDataUrl = project.generated_qrs[0].data_url;
+                } else if (project.qr_data_url) {
+                    currentQrDataUrl = project.qr_data_url;
                 } else {
                     const qrText = `INVITAIA:${selectedTemplate.name}\n${JSON.stringify(currentW4h1)}`;
                     currentQrDataUrl = await QRCode.toDataURL(qrText, { margin: 2, width: 256 });
@@ -1473,38 +1514,51 @@
         // Duplicar un proyecto en Supabase
         async function duplicateProjectInDB(id) {
             try {
-                const { data: original, error: fetchErr } = await supabaseClient
-                    .from("projects")
-                    .select("*")
-                    .eq("id", id)
-                    .single();
-                if (fetchErr) throw fetchErr;
-                
-                const { data: duplicate, error: insertErr } = await supabaseClient
-                    .from("projects")
-                    .insert({
-                        event_type_slug: original.event_type_slug,
-                        event_type_name: original.event_type_name,
-                        form_data: original.form_data,
-                        w4h1: original.w4h1
-                    })
-                    .select()
-                    .single();
-                if (insertErr) throw insertErr;
-                
-                const { data: qrs } = await supabaseClient
-                    .from("generated_qrs")
-                    .select("*")
-                    .eq("project_id", id);
+                if (!hasSupabaseConfig || !supabaseClient) {
+                    const projects = getLocalProjects();
+                    const original = projects.find((p) => p.id === id);
+                    if (!original) throw new Error("Proyecto local no encontrado");
+                    const duplicate = {
+                        ...original,
+                        id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+                        created_at: new Date().toISOString()
+                    };
+                    projects.unshift(duplicate);
+                    setLocalProjects(projects);
+                } else {
+                    const { data: original, error: fetchErr } = await supabaseClient
+                        .from("projects")
+                        .select("*")
+                        .eq("id", id)
+                        .single();
+                    if (fetchErr) throw fetchErr;
                     
-                if (qrs && qrs.length > 0) {
-                    await supabaseClient
-                        .from("generated_qrs")
+                    const { data: duplicate, error: insertErr } = await supabaseClient
+                        .from("projects")
                         .insert({
-                            project_id: duplicate.id,
-                            payload: qrs[0].payload,
-                            data_url: qrs[0].data_url
-                        });
+                            event_type_slug: original.event_type_slug,
+                            event_type_name: original.event_type_name,
+                            form_data: original.form_data,
+                            w4h1: original.w4h1
+                        })
+                        .select()
+                        .single();
+                    if (insertErr) throw insertErr;
+                    
+                    const { data: qrs } = await supabaseClient
+                        .from("generated_qrs")
+                        .select("*")
+                        .eq("project_id", id);
+                        
+                    if (qrs && qrs.length > 0) {
+                        await supabaseClient
+                            .from("generated_qrs")
+                            .insert({
+                                project_id: duplicate.id,
+                                payload: qrs[0].payload,
+                                data_url: qrs[0].data_url
+                            });
+                    }
                 }
 
                 alert("Proyecto duplicado con xito");
@@ -1519,11 +1573,16 @@
         async function deleteProjectFromDB(id) {
             if (!confirm("Estas seguro de que deseas eliminar este proyecto de forma permanente del backend?")) return;
             try {
-                const { error } = await supabaseClient
-                    .from("projects")
-                    .delete()
-                    .eq("id", id);
-                if (error) throw error;
+                if (!hasSupabaseConfig || !supabaseClient) {
+                    const projects = getLocalProjects().filter((p) => p.id !== id);
+                    setLocalProjects(projects);
+                } else {
+                    const { error } = await supabaseClient
+                        .from("projects")
+                        .delete()
+                        .eq("id", id);
+                    if (error) throw error;
+                }
                 
                 alert("Proyecto eliminado con xito");
                 await loadProjectsFromSupabase();
