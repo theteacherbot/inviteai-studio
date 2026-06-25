@@ -1,4 +1,9 @@
-export type FieldType = "text" | "date" | "time" | "number" | "textarea";
+export type FieldType = "text" | "date" | "time" | "number" | "textarea" | "select";
+
+export interface FieldOption {
+  label: string;
+  value: string;
+}
 
 export interface FieldDef {
   name: string;
@@ -6,6 +11,7 @@ export interface FieldDef {
   type: FieldType;
   placeholder?: string;
   required?: boolean;
+  options?: FieldOption[];
 }
 
 export interface W4H1 {
@@ -40,6 +46,79 @@ const WHEN_WHERE_FIELDS: FieldDef[] = [
   { name: "lugar", label: "Lugar", type: "text", required: true },
 ];
 
+const IMAGE_CONTROL_FIELDS: FieldDef[] = [
+  {
+    name: "pollinationsApiKey",
+    label: "Pollinations API Key",
+    type: "text",
+    placeholder: "Opcional: pega tu API key",
+  },
+  {
+    name: "imageModel",
+    label: "Modelo de generación",
+    type: "select",
+    required: true,
+    options: [
+      { label: "Flux", value: "flux" },
+      { label: "Zimage", value: "zimage" },
+      { label: "Klein", value: "klein" },
+      { label: "Grok Imagine", value: "grok-imagine" },
+      { label: "Nanobanana", value: "nanobanana" },
+    ],
+  },
+  {
+    name: "designType",
+    label: "Tipo de diseño",
+    type: "select",
+    required: true,
+    options: [
+      { label: "Bautizo", value: "bautizo" },
+      { label: "Primera comunión", value: "primera comunion" },
+      { label: "Matrimonio", value: "matrimonio" },
+      { label: "Quince", value: "quince" },
+      { label: "Cumpleaños", value: "cumpleanos" },
+      { label: "Baby shower", value: "baby shower" },
+      { label: "Aniversario", value: "aniversario" },
+      { label: "Graduación", value: "graduacion" },
+    ],
+  },
+  {
+    name: "visualStyle",
+    label: "Estilo visual",
+    type: "select",
+    required: true,
+    options: [
+      { label: "Futurista", value: "futurista" },
+      { label: "Minimalista", value: "minimalista" },
+      { label: "Retro", value: "retro" },
+      { label: "Editorial de lujo", value: "editorial lujo" },
+      { label: "Acuarela", value: "acuarela" },
+      { label: "Boho chic", value: "boho chic" },
+      { label: "Clásico elegante", value: "clasico elegante" },
+    ],
+  },
+  {
+    name: "aspectRatio",
+    label: "Relación de aspecto",
+    type: "select",
+    required: true,
+    options: [
+      { label: "1:1 (cuadrado)", value: "1:1" },
+      { label: "4:5 (vertical)", value: "4:5" },
+      { label: "2:3 (vertical)", value: "2:3" },
+      { label: "3:4 (vertical)", value: "3:4" },
+      { label: "16:9 (horizontal)", value: "16:9" },
+      { label: "9:16 (story)", value: "9:16" },
+    ],
+  },
+  {
+    name: "quickParams",
+    label: "Parámetros rápidos (iluminación, efectos)",
+    type: "text",
+    placeholder: "Ej: luz cálida, bokeh suave, grano fino, contraste alto",
+  },
+];
+
 const social = (d: Record<string, string>) => ({
   instagram: d.instagram || "",
   whatsapp: d.whatsapp || "",
@@ -62,9 +141,21 @@ interface TemplateConfig {
   promptSubject: (d: Record<string, string>) => string;
 }
 
+function generationSettings(d: Record<string, string>) {
+  return {
+    generacionImagen: {
+      modelo: d.imageModel || "flux",
+      tipoDiseno: d.designType || null,
+      estiloVisual: d.visualStyle || null,
+      aspectRatio: d.aspectRatio || "4:5",
+      parametrosRapidos: d.quickParams || null,
+    },
+  };
+}
+
 function buildTemplate(cfg: TemplateConfig): EventTemplate {
   const fields =
-    cfg.customFields ?? [...cfg.extraFields, ...WHEN_WHERE_FIELDS, ...SOCIAL_FIELDS];
+    cfg.customFields ?? [...cfg.extraFields, ...WHEN_WHERE_FIELDS, ...IMAGE_CONTROL_FIELDS, ...SOCIAL_FIELDS];
 
   return {
     id: cfg.id,
@@ -78,12 +169,20 @@ function buildTemplate(cfg: TemplateConfig): EventTemplate {
       when: { fecha: d.fecha, hora: d.hora },
       where: cfg.where ? cfg.where(d) : { lugar: d.lugar },
       why: cfg.why(d),
-      how: cfg.how(d),
+      how: { ...cfg.how(d), ...generationSettings(d) },
     }),
-    buildPrompt: (d) =>
-      `${cfg.promptSubject(d)} Date ${d.fecha} at ${d.hora}, venue ${d.lugar || "—"}. ` +
-      `Style: ${cfg.promptStyle}, photorealistic, high detail, 4k, editorial typography, ` +
-      `Apple-like minimal luxury, gold accents on white and black.`,
+    buildPrompt: (d) => {
+      const designType = d.designType || cfg.name;
+      const visualStyle = d.visualStyle || cfg.promptStyle;
+      const aspectRatio = d.aspectRatio || "4:5";
+      const quickParams = d.quickParams ? ` Extra parameters: ${d.quickParams}.` : "";
+      return (
+        `${cfg.promptSubject(d)} Date ${d.fecha} at ${d.hora}, venue ${d.lugar || "—"}. ` +
+        `Design type: ${designType}. Visual style: ${visualStyle}. Aspect ratio ${aspectRatio}. ` +
+        `Photorealistic, high detail, 4k, editorial typography, Apple-like minimal luxury, gold accents on white and black.` +
+        quickParams
+      );
+    },
   };
 }
 
@@ -123,6 +222,7 @@ export const EVENT_TEMPLATES: EventTemplate[] = [
       { name: "hora", label: "Hora", type: "time", required: true },
       { name: "ceremonia", label: "Ceremonia", type: "text", required: true, placeholder: "Iglesia / lugar" },
       { name: "recepcion", label: "Recepción", type: "text", required: true, placeholder: "Salón / lugar" },
+      ...IMAGE_CONTROL_FIELDS,
       ...SOCIAL_FIELDS,
     ],
     who: (d) => ({ novia: d.novia, novio: d.novio }),

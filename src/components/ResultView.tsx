@@ -14,19 +14,73 @@ interface Props {
   onBack: () => void;
 }
 
+const ASPECT_RATIO_TO_SIZE: Record<string, { width: number; height: number }> = {
+  "1:1": { width: 1024, height: 1024 },
+  "4:5": { width: 1024, height: 1280 },
+  "2:3": { width: 1024, height: 1536 },
+  "3:4": { width: 960, height: 1280 },
+  "16:9": { width: 1366, height: 768 },
+  "9:16": { width: 768, height: 1366 },
+};
+
 export function ResultView({ template, data, onBack }: Props) {
   const w4h1 = template.buildW4H1(data);
   const prompt = template.buildPrompt(data);
+  const selectedModel = data.imageModel || "flux";
+  const selectedAspectRatio = data.aspectRatio || "4:5";
+  const selectedDesignType = data.designType || template.name;
+  const selectedVisualStyle = data.visualStyle || "minimalista";
+  const quickParams = data.quickParams?.trim() || "";
+  const imageSize = ASPECT_RATIO_TO_SIZE[selectedAspectRatio] ?? ASPECT_RATIO_TO_SIZE["4:5"];
+  const imagePrompt = [
+    prompt,
+    `Model: ${selectedModel}.`,
+    `Design type: ${selectedDesignType}.`,
+    `Visual style: ${selectedVisualStyle}.`,
+    `Aspect ratio: ${selectedAspectRatio}.`,
+    quickParams ? `Quick parameters: ${quickParams}.` : "",
+    `JSON context: ${JSON.stringify(w4h1)}.`,
+  ]
+    .filter(Boolean)
+    .join(" ");
   const [qrUrl, setQrUrl] = useState<string>("");
   const [savedId, setSavedId] = useState<string | null>(null);
   const [promptId, setPromptId] = useState<string | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  const primaryName =
+    data.nombre ||
+    data.novia ||
+    data.mama ||
+    data.graduado ||
+    data.comulgante ||
+    data.anfitrion ||
+    "Tu evento";
+  const secondaryName = data.novio || data.bebe || data.padres || "";
+  const dateLine = [data.fecha, data.hora].filter(Boolean).join(" · ");
+  const locationLine =
+    data.lugar ||
+    data.ceremonia ||
+    data.parroquia ||
+    data.recepcion ||
+    data.direccion ||
+    data.institucion ||
+    "";
+  const accentLine = data.tema || data.codigoVestimenta || data.colores || data.mensaje || "";
+
   const { status: imageStatus, image } = useGeneratedImage({
     projectId: savedId,
     promptId,
-    prompt,
+    prompt: imagePrompt,
+    providerId: "pollinations",
+    metadata: {
+      model: selectedModel,
+      width: imageSize.width,
+      height: imageSize.height,
+      apiKey: data.pollinationsApiKey?.trim() || undefined,
+    },
   });
+  const generatedImageUrl = image?.url ?? null;
 
   const qrPayload = {
     rsvp: true,
@@ -110,6 +164,7 @@ export function ResultView({ template, data, onBack }: Props) {
     pdf.setFontSize(13);
     let y = 200;
     template.fields.forEach((f) => {
+      if (f.name === "pollinationsApiKey") return;
       const v = data[f.name];
       if (!v) return;
       pdf.setTextColor(120, 120, 120);
@@ -193,52 +248,98 @@ export function ResultView({ template, data, onBack }: Props) {
   return (
     <div className="grid gap-8 lg:grid-cols-[1.1fr_1fr]">
       {/* Invitation preview */}
-      <Card className="overflow-hidden border-border p-0">
-        <div
-          ref={cardRef}
-          className="relative flex min-h-[640px] flex-col items-center justify-center gap-6 bg-gradient-to-b from-white to-accent/40 p-10 text-center"
-        >
-          <div className="text-xs uppercase tracking-[0.3em] text-gold">
-            {template.name}
+      <Card className="overflow-hidden border-border p-0 shadow-lg shadow-black/5">
+        <div ref={cardRef} className="relative min-h-[680px] overflow-hidden bg-[#111111] text-white">
+          {generatedImageUrl ? (
+            <img
+              src={generatedImageUrl}
+              alt={`Imagen generada para ${template.name}`}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(200,165,90,0.35),_transparent_36%),linear-gradient(180deg,_#181818_0%,_#0f0f0f_100%)]" />
+          )}
+
+          <div className="absolute inset-0 bg-gradient-to-b from-black/15 via-black/35 to-black/80" />
+          <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-black/45 to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-52 bg-gradient-to-t from-black/85 via-black/55 to-transparent" />
+
+          <div className="relative flex min-h-[680px] flex-col justify-between p-6 sm:p-8">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-black/35 px-3 py-1 text-[10px] uppercase tracking-[0.32em] text-white/90 backdrop-blur">
+                  <span>{template.icon}</span>
+                  <span>{template.name}</span>
+                </div>
+                <p className="mt-3 max-w-xs text-sm leading-relaxed text-white/82">
+                  {template.description}
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/15 bg-black/35 px-3 py-2 text-right backdrop-blur">
+                <p className="text-[10px] uppercase tracking-[0.28em] text-white/60">IA</p>
+                <p className="text-xs text-white/90">Preview generado</p>
+              </div>
+            </div>
+
+            <div className="grid gap-6 rounded-[2rem] border border-white/10 bg-black/20 p-6 backdrop-blur-xl sm:p-8">
+              <div className="space-y-3 text-center">
+                <p className="text-[10px] uppercase tracking-[0.4em] text-white/70">Invitación</p>
+                <h2 className="font-display text-4xl font-semibold leading-tight sm:text-5xl">
+                  {primaryName}
+                  {secondaryName ? (
+                    <>
+                      <span className="mx-2 text-gold">&</span>
+                      <span>{secondaryName}</span>
+                    </>
+                  ) : null}
+                </h2>
+                {accentLine ? <p className="text-sm italic text-white/80">{accentLine}</p> : null}
+              </div>
+
+              <div className="grid gap-3 text-center text-sm text-white/85 sm:grid-cols-3 sm:text-left">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-white/55">Fecha</p>
+                  <p className="mt-1 text-base font-medium text-white">{dateLine || "Por confirmar"}</p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-4 sm:col-span-2">
+                  <p className="text-[10px] uppercase tracking-[0.28em] text-white/55">Lugar</p>
+                  <p className="mt-1 text-base font-medium text-white">{locationLine || "Lugar por definir"}</p>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-between">
+                <div className="max-w-md text-center sm:text-left">
+                  <p className="text-xs uppercase tracking-[0.28em] text-white/55">Detalles</p>
+                  <p className="mt-2 text-sm leading-relaxed text-white/85">
+                    {template.description} La imagen se compone a partir del JSON y del prompt creados por la app.
+                  </p>
+                </div>
+
+                {qrUrl ? (
+                  <div className="flex flex-col items-center gap-2 rounded-3xl border border-white/10 bg-white p-3 text-center text-black shadow-2xl shadow-black/30">
+                    <img src={qrUrl} alt="QR" className="h-24 w-24 rounded-2xl bg-white" />
+                    <p className="text-[10px] uppercase tracking-[0.28em] text-black/55">Escanea para confirmar</p>
+                  </div>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="flex items-end justify-between gap-4 text-xs text-white/75">
+              <div>
+                <p className="text-[10px] uppercase tracking-[0.28em] text-white/50">Imagen generada</p>
+                <p className="mt-1">
+                  {imageStatus === "loading"
+                    ? "Generando invitación…"
+                    : imageStatus === "error"
+                      ? "Se usará un fondo alternativo"
+                      : "Lista para descargar"}
+                </p>
+              </div>
+              <div className="rounded-full border border-white/10 bg-black/35 px-3 py-1 backdrop-blur">
+                {`${image?.provider ?? "mock"} · ${selectedModel}`}
+              </div>
+            </div>
           </div>
-          <div className="h-px w-16 bg-gold" />
-          {imageStatus === "loading" && (
-            <div className="flex h-48 w-48 animate-pulse items-center justify-center rounded-xl bg-muted text-xs text-muted-foreground">
-              Generando imagen…
-            </div>
-          )}
-          {imageStatus === "ready" && image && (
-            <div className="flex flex-col items-center gap-2">
-              <img
-                src={image.url}
-                alt={`Imagen generada para ${template.name}`}
-                className="h-56 w-56 rounded-xl border object-cover shadow-sm"
-              />
-              <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                Provider: {image.provider ?? "mock"}
-              </p>
-            </div>
-          )}
-          {imageStatus === "error" && (
-            <p className="text-xs text-destructive">No se pudo generar la imagen</p>
-          )}
-          <h2 className="font-display text-4xl font-semibold">
-            {data.nombre || data.novia || "Tu evento"}
-            {data.novio && <> <span className="text-gold">&</span> {data.novio}</>}
-          </h2>
-          <div className="grid gap-2 text-sm text-muted-foreground">
-            {data.fecha && <p className="text-base text-foreground">{data.fecha} · {data.hora}</p>}
-            {data.lugar && <p>{data.lugar}</p>}
-            {data.ceremonia && <p>Ceremonia: {data.ceremonia}</p>}
-            {data.recepcion && <p>Recepción: {data.recepcion}</p>}
-            {data.tema && <p className="italic">Tema: {data.tema}</p>}
-          </div>
-          {qrUrl && (
-            <div className="mt-4 flex flex-col items-center gap-2">
-              <img src={qrUrl} alt="QR" className="h-32 w-32 rounded-lg border bg-white p-2" />
-              <p className="text-xs text-muted-foreground">Escanea para confirmar</p>
-            </div>
-          )}
         </div>
       </Card>
 
@@ -267,15 +368,15 @@ export function ResultView({ template, data, onBack }: Props) {
         <Card className="p-5">
           <div className="mb-2 flex items-center justify-between">
             <h3 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground">
-              Prompt IA
+              Prompt IA + JSON
             </h3>
-            <Button size="sm" variant="ghost" onClick={() => copy(prompt, "Prompt")}>
+            <Button size="sm" variant="ghost" onClick={() => copy(imagePrompt, "Prompt")}>
               Copiar
             </Button>
           </div>
-          <p className="rounded-lg bg-muted p-4 text-sm leading-relaxed">{prompt}</p>
+          <p className="rounded-lg bg-muted p-4 text-sm leading-relaxed">{imagePrompt}</p>
           <p className="mt-3 text-xs text-muted-foreground">
-            Listo para usar con OpenAI Images, Pollinations, Flux o Ideogram.
+            Usa modelo {selectedModel} con relación {selectedAspectRatio} y contexto W4H1.
           </p>
         </Card>
       </div>
